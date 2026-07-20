@@ -2,30 +2,30 @@ import React, { useState } from 'react';
 import { Database, Wifi, WifiOff, Settings, ShieldAlert, Cpu } from 'lucide-react';
 import { playSound } from '../utils/audio';
 
-interface SupabaseConfigProps {
-  onHostGame: (url: string, key: string) => void;
-  onJoinGame: (url: string, key: string, code: string) => void;
+interface RenderConfigProps {
+  onHostGame: (url: string) => void;
+  onJoinGame: (url: string, code: string) => void;
   onPlayOffline: () => void;
 }
 
-export const SupabaseConfig: React.FC<SupabaseConfigProps> = ({
+export const RenderConfig: React.FC<RenderConfigProps> = ({
   onHostGame,
   onJoinGame,
   onPlayOffline,
 }) => {
-  const [url, setUrl] = useState(localStorage.getItem('supabase_url') || 'https://clngazemowopxvfqwnfq.supabase.co');
-  const [key, setKey] = useState(localStorage.getItem('supabase_key') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNsbmdhemVtb3dvcHh2ZnF3bmZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwNjY5OTcsImV4cCI6MjA5OTY0Mjk5N30.zWN5WlSOT8f5ElGVIv-nDHbRdc4KsAY34wfgajQN5Ro');
+  const [url, setUrl] = useState(
+    localStorage.getItem('render_server_url') || 'wss://mygameserver-bsow.onrender.com/'
+  );
   const [roomCode, setRoomCode] = useState('');
   const [showSettings, setShowSettings] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const hasCreds = url.trim() !== '' && key.trim() !== '';
+  const hasCreds = url.trim() !== '';
 
   const handleSaveSettings = (e: React.FormEvent) => {
     e.preventDefault();
-    if (url.trim() && key.trim()) {
-      localStorage.setItem('supabase_url', url.trim());
-      localStorage.setItem('supabase_key', key.trim());
+    if (url.trim()) {
+      localStorage.setItem('render_server_url', url.trim());
       setShowSettings(false);
       setErrorMessage('');
       playSound.ping();
@@ -33,18 +33,18 @@ export const SupabaseConfig: React.FC<SupabaseConfigProps> = ({
   };
 
   const handleHost = () => {
-    if (!url.trim() || !key.trim()) {
-      setErrorMessage('WARN: Server config missing. Please set Supabase Credentials below.');
+    if (!url.trim()) {
+      setErrorMessage('WARN: Server config missing. Please set Render Server URL below.');
       playSound.klaxon();
       return;
     }
     playSound.ping();
-    onHostGame(url.trim(), key.trim());
+    onHostGame(url.trim());
   };
 
   const handleJoin = () => {
-    if (!url.trim() || !key.trim()) {
-      setErrorMessage('WARN: Server config missing. Please set Supabase Credentials below.');
+    if (!url.trim()) {
+      setErrorMessage('WARN: Server config missing. Please set Render Server URL below.');
       playSound.klaxon();
       return;
     }
@@ -54,7 +54,7 @@ export const SupabaseConfig: React.FC<SupabaseConfigProps> = ({
       return;
     }
     playSound.ping();
-    onJoinGame(url.trim(), key.trim(), roomCode.trim().toUpperCase());
+    onJoinGame(url.trim(), roomCode.trim().toUpperCase());
   };
 
   return (
@@ -118,7 +118,7 @@ export const SupabaseConfig: React.FC<SupabaseConfigProps> = ({
               onClick={handleHost}
               className="w-full btn-radar py-3 text-sm font-semibold uppercase flex items-center justify-center gap-2 border-p1 text-p1"
             >
-              <Database className="w-4 h-4" /> Host New Server Sector (Realtime)
+              <Database className="w-4 h-4" /> Host New Server Sector (Render)
             </button>
 
             {/* Offline Sandbox Fallback */}
@@ -146,26 +146,15 @@ export const SupabaseConfig: React.FC<SupabaseConfigProps> = ({
             <form onSubmit={handleSaveSettings} className="space-y-3 mt-4 text-left p-3 border border-p1 border-opacity-30 bg-black bg-opacity-40">
               <div className="text-[10px] text-p2 uppercase font-semibold flex items-center gap-1.5 mb-2">
                 <ShieldAlert className="w-3.5 h-3.5" />
-                Input credentials once to enable Realtime Broadcast matchmaking
+                Input Render WebSocket server URL once to enable Realtime Broadcast matchmaking
               </div>
               <div>
-                <label className="block text-[10px] uppercase mb-0.5 text-p1">Supabase URL</label>
+                <label className="block text-[10px] uppercase mb-0.5 text-p1">Render Server URL</label>
                 <input
                   type="text"
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
-                  placeholder="https://your-project.supabase.co"
-                  className="w-full bg-black border border-p1 text-p1 p-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-p1"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] uppercase mb-0.5 text-p1">Supabase Anon Key</label>
-                <input
-                  type="password"
-                  value={key}
-                  onChange={(e) => setKey(e.target.value)}
-                  placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  placeholder="wss://your-service.onrender.com/"
                   className="w-full bg-black border border-p1 text-p1 p-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-p1"
                   required
                 />

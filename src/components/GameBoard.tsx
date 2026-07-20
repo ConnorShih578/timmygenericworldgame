@@ -142,7 +142,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
     if (targetActionMode === 'attack' && selectedNodeId) {
       // Validate adjacent connection or empire-wide path reachability
-      const canAttackOrReinforce = canReachNode(selectedNodeId, nodeId, currentUserId, nodes, connections);
+      const canAttackOrReinforce = canReachNode(selectedNodeId, nodeId, currentUserId, nodes, connections, alliances);
       const isTargetAllied = areAllied(clickedNode.ownerId, currentUserId);
 
       if (canAttackOrReinforce) {
@@ -238,9 +238,26 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                   ND:{ownedNodes.length} TR:{totalTroops}
                 </span>
                 {allianceActive && (
-                  <span className="text-[9px] uppercase border px-1" style={{ color: p.color, borderColor: p.color }}>
-                    ALLY
-                  </span>
+                  <div className="flex items-center gap-1.5 ml-1">
+                    <span className="text-[9px] uppercase border px-1" style={{ color: p.color, borderColor: p.color }}>
+                      ALLY
+                    </span>
+                    <button
+                      onClick={() => {
+                        const alliance = alliances.find(
+                          a => a.status === 'active' && a.members.includes(p.id) && a.members.includes(currentUserId)
+                        );
+                        if (alliance) {
+                          if (soundEnabled) playSound.klaxon();
+                          onBreakAlliance(alliance.id);
+                        }
+                      }}
+                      className="px-1 border border-red-500 text-[8px] uppercase text-red-400 bg-black hover:bg-red-950"
+                      title="DISBAND COALITION"
+                    >
+                      DISBAND
+                    </button>
+                  </div>
                 )}
                 {p.id !== currentUserId && p.isAlive && !allianceActive && (
                   <button
@@ -723,7 +740,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                   {/* Target Action Highlight ring */}
                   {targetActionMode !== 'none' && selectedNodeId && (
                     targetActionMode === 'attack'
-                      ? canReachNode(selectedNodeId, node.id, currentUserId, nodes, connections)
+                      ? canReachNode(selectedNodeId, node.id, currentUserId, nodes, connections, alliances)
                       : getConnection(selectedNodeId, node.id)
                   ) && (
                     <circle

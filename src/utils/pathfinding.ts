@@ -1,16 +1,24 @@
-import type { CountryNode, BorderConnection } from '../types/game';
+import type { CountryNode, BorderConnection, Alliance } from '../types/game';
+
+function areAllied(playerAId: string | null, playerBId: string | null, alliances: Alliance[]) {
+  if (!playerAId || !playerBId || playerAId === playerBId) return false;
+  return alliances.some(
+    a => a.status === 'active' && a.members.includes(playerAId) && a.members.includes(playerBId)
+  );
+}
 
 /**
  * BFS Graph Pathfinder for Empire-Wide Operations:
- * 1. Transport troops anywhere throughout your empire as long as they are completely connected by friendly nodes.
- * 2. Attack connected empires/territories as long as they are connected to any node in your empire network by a border link.
+ * 1. Transport troops anywhere throughout your empire as long as they are completely connected by friendly/allied nodes.
+ * 2. Attack/reinforce connected empires/territories as long as they are connected to any node in your empire network by a border link.
  */
 export function canReachNode(
   sourceId: string,
   targetId: string,
   currentUserId: string,
   nodes: CountryNode[],
-  connections: BorderConnection[]
+  connections: BorderConnection[],
+  alliances: Alliance[]
 ): boolean {
   if (sourceId === targetId) return false;
 
@@ -35,7 +43,7 @@ export function canReachNode(
     adjMap[c.to].push(c.from);
   });
 
-  const isTargetFriendly = targetNode.ownerId === currentUserId;
+  const isTargetFriendly = targetNode.ownerId === currentUserId || areAllied(targetNode.ownerId, currentUserId, alliances);
 
   while (queue.length > 0) {
     const currentId = queue.shift()!;
@@ -43,21 +51,28 @@ export function canReachNode(
     const neighbors = adjMap[currentId] || [];
     for (const neighborId of neighbors) {
       if (neighborId === targetId) {
-        // Friendly reinforcement: can transport anywhere in connected empire
+        // Friendly reinforcement: can transport anywhere in connected empire/coalition
         if (isTargetFriendly) {
           return true;
         } else {
-          // Hostile/Neutral attack: currentId must be a friendly node adjacent to targetId
+          // Hostile/Neutral attack: currentId must be a friendly/allied node adjacent to targetId
           const borderNode = nodes.find(n => n.id === currentId);
-          if (borderNode && borderNode.ownerId === currentUserId) {
+          if (
+            borderNode &&
+            (borderNode.ownerId === currentUserId || areAllied(borderNode.ownerId, currentUserId, alliances))
+          ) {
             return true;
           }
         }
       }
 
-      // Continue BFS expansion only through friendly nodes
+      // Continue BFS expansion only through friendly or allied nodes
       const neighborNode = nodes.find(n => n.id === neighborId);
-      if (neighborNode && neighborNode.ownerId === currentUserId && !visited.has(neighborId)) {
+      const isNeighborFriendly =
+        neighborNode &&
+        (neighborNode.ownerId === currentUserId || areAllied(neighborNode.ownerId, currentUserId, alliances));
+
+      if (isNeighborFriendly && !visited.has(neighborId)) {
         visited.add(neighborId);
         queue.push(neighborId);
       }
@@ -66,3 +81,4 @@ export function canReachNode(
 
   return false;
 }
+

@@ -1,9 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { createClient } from '@supabase/supabase-js';
-import type { RealtimeChannel } from '@supabase/supabase-js';
 import type { Player, TransitTroops, Alliance, GameLog, GameState, Posture, CountryNode } from './types/game';
 import { ERAS } from './constants/eras';
-import { SupabaseConfig } from './components/SupabaseConfig';
+import { RenderConfig } from './components/RenderConfig';
 import { Lobby } from './components/Lobby';
 import { Preamble } from './components/Preamble';
 import { RockPaperScissors } from './components/RockPaperScissors';
@@ -43,9 +41,9 @@ const playerColors = [
 ];
 
 export default function App() {
-  const [supabaseCreds, setSupabaseCreds] = useState<{ url: string; key: string } | null>(null);
+  const [renderUrl, setRenderUrl] = useState<string | null>(null);
   const [isOffline, setIsOffline] = useState<boolean>(false);
-  const [channel, setChannel] = useState<RealtimeChannel | null>(null);
+  const [socket, setSocket] = useState<WebSocket | null>(null);
   const [showTutorial, setShowTutorial] = useState<boolean>(true);
   
   // Core game state
@@ -75,14 +73,14 @@ export default function App() {
     initializeOfflineLobby();
   };
 
-  const handleHostGame = (url: string, key: string) => {
-    setSupabaseCreds({ url, key });
-    initializeOnlineLobby(url, key);
+  const handleHostGame = (url: string) => {
+    setRenderUrl(url);
+    initializeOnlineLobby(url);
   };
 
-  const handleJoinGame = (url: string, key: string, code: string) => {
-    setSupabaseCreds({ url, key });
-    joinOnlineLobby(url, key, code);
+  const handleJoinGame = (url: string, code: string) => {
+    setRenderUrl(url);
+    joinOnlineLobby(url, code);
   };
 
   // ----------------------------------------------------
@@ -148,10 +146,9 @@ export default function App() {
   };
 
   // ----------------------------------------------------
-  // ONLINE MATCHMAKING (Supabase Realtime Broadcast)
+  // ONLINE MATCHMAKING (Render WebSockets)
   // ----------------------------------------------------
-  const initializeOnlineLobby = (url: string, key: string) => {
-    const supabase = createClient(url, key);
+  const initializeOnlineLobby = (serverUrl: string) => {
     const code = generateRoomCode();
     
     const host: Player = {
@@ -166,36 +163,52 @@ export default function App() {
       isAlive: true,
     };
 
-    const newChannel = supabase.channel(`room_${code}`);
+    const ws = new WebSocket(serverUrl);
     
-    newChannel
-      .on('broadcast', { event: 'player_join' }, ({ payload }) => {
-        handleOnlinePlayerJoined(payload);
-      })
-      .on('broadcast', { event: 'state_sync' }, ({ payload }) => {
-        handleOnlineStateSync(payload);
-      })
-      .on('broadcast', { event: 'action' }, ({ payload }) => {
-        handleOnlineAction(payload);
-      })
-      .subscribe((status) => {
-        if (status === 'SUBSCRIBED') {
-          setGameState(prev => ({
-            ...prev,
-            roomId: `online_${code}`,
-            roomCode: code,
-            players: [host],
-            logs: [{ id: 'init', message: `Encrypted lobby hosting on ${code}`, timestamp: new Date().toLocaleTimeString() }]
-          }));
-        }
-      });
+    ws.onopen = () => {
+      setGameState(prev => ({
+        ...prev,
+        roomId: `online_${code}`,
+        roomCode: code,
+        players: [host],
+        logs: [{ id: 'init', message: `Encrypted lobby hosting on ${code}`, timestamp: new Date().toLocaleTimeString() }]
+      }));
+    };
 
-    setChannel(newChannel);
+    ws.onmessage = (event) => {
+      try {
+        const msg = JSON.parse(event.data);
+        if (msg.roomCode !== code) return; // Room filter!
+
+        switch (msg.event) {
+          case 'player_join':
+            handleOnlinePlayerJoined(msg.data);
+            break;
+          case 'state_sync':
+            handleOnlineStateSync(msg.data);
+            break;
+          case 'action':
+            handleOnlineAction({ senderId: msg.senderId, event: msg.data.event, data: msg.data.data });
+            break;
+          default:
+            break;
+        }
+      } catch (err) {
+        console.error('Error parsing WS message:', err);
+      }
+    };
+
+    ws.onclose = () => {
+      setGameState(prev => ({
+        ...prev,
+        logs: [...prev.logs, { id: 'disc', message: 'Connection to server lost.', timestamp: new Date().toLocaleTimeString() }]
+      }));
+    };
+
+    setSocket(ws);
   };
 
-  const joinOnlineLobby = (url: string, key: string, code: string) => {
-    const supabase = createClient(url, key);
-    
+  const joinOnlineLobby = (serverUrl: string, code: string) => {
     const guest: Player = {
       id: myPlayerId,
       name: myPlayerName,
@@ -208,38 +221,56 @@ export default function App() {
       isAlive: true,
     };
 
-    const newChannel = supabase.channel(`room_${code}`);
+    const ws = new WebSocket(serverUrl);
     
-    newChannel
-      .on('broadcast', { event: 'player_join' }, ({ payload }) => {
-        handleOnlinePlayerJoined(payload);
-      })
-      .on('broadcast', { event: 'state_sync' }, ({ payload }) => {
-        handleOnlineStateSync(payload);
-      })
-      .on('broadcast', { event: 'action' }, ({ payload }) => {
-        handleOnlineAction(payload);
-      })
-      .subscribe((status) => {
-        if (status === 'SUBSCRIBED') {
-          setGameState(prev => ({
-            ...prev,
-            roomId: `online_${code}`,
-            roomCode: code,
-            players: [guest],
-            logs: [{ id: 'init_join', message: `Connected to sector ${code}. Awaiting host data...`, timestamp: new Date().toLocaleTimeString() }]
-          }));
+    ws.onopen = () => {
+      setGameState(prev => ({
+        ...prev,
+        roomId: `online_${code}`,
+        roomCode: code,
+        players: [guest],
+        logs: [{ id: 'init_join', message: `Connected to sector ${code}. Awaiting host data...`, timestamp: new Date().toLocaleTimeString() }]
+      }));
 
-          // Signal join to host
-          newChannel.send({
-            type: 'broadcast',
-            event: 'player_join',
-            payload: { player: guest }
-          });
+      // Signal join to host
+      ws.send(JSON.stringify({
+        roomCode: code,
+        event: 'player_join',
+        data: { player: guest }
+      }));
+    };
+
+    ws.onmessage = (event) => {
+      try {
+        const msg = JSON.parse(event.data);
+        if (msg.roomCode !== code) return; // Room filter!
+
+        switch (msg.event) {
+          case 'player_join':
+            handleOnlinePlayerJoined(msg.data);
+            break;
+          case 'state_sync':
+            handleOnlineStateSync(msg.data);
+            break;
+          case 'action':
+            handleOnlineAction({ senderId: msg.senderId, event: msg.data.event, data: msg.data.data });
+            break;
+          default:
+            break;
         }
-      });
+      } catch (err) {
+        console.error('Error parsing WS message:', err);
+      }
+    };
 
-    setChannel(newChannel);
+    ws.onclose = () => {
+      setGameState(prev => ({
+        ...prev,
+        logs: [...prev.logs, { id: 'disc', message: 'Connection to server lost.', timestamp: new Date().toLocaleTimeString() }]
+      }));
+    };
+
+    setSocket(ws);
   };
 
   const handleOnlinePlayerJoined = (payload: { player: Player }) => {
@@ -255,12 +286,12 @@ export default function App() {
       });
 
       // Host syncs state to new joiners
-      if (myPlayerId === stateRef.current.players[0].id && channel) {
-        channel.send({
-          type: 'broadcast',
+      if (myPlayerId === stateRef.current.players[0].id && socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({
+          roomCode: stateRef.current.roomCode,
           event: 'state_sync',
-          payload: { state: { ...stateRef.current, players: updatedPlayers } }
-        });
+          data: { state: { ...stateRef.current, players: updatedPlayers } }
+        }));
       }
     }
   };
@@ -275,12 +306,13 @@ export default function App() {
 
   // Helper to send game actions over broadcast channel
   const broadcastAction = (event: string, data: any) => {
-    if (channel) {
-      channel.send({
-        type: 'broadcast',
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify({
+        roomCode: stateRef.current.roomCode,
+        senderId: myPlayerId,
         event: 'action',
-        payload: { senderId: myPlayerId, event, data }
-      });
+        data: { event, data }
+      }));
     }
   };
 
@@ -757,8 +789,8 @@ export default function App() {
 
       const targetAlliance = prev.alliances.find(a => a.id === allianceId);
       const membersText = targetAlliance?.members
-        .map(mId => prev.players.find(p => p.id === mId)?.name)
-        .join(' and ');
+        ?.map(mId => prev.players.find(p => p.id === mId)?.name || 'Unknown')
+        .join(' and ') || 'Unknown Terminals';
 
       return {
         ...prev,
@@ -826,7 +858,9 @@ export default function App() {
       });
 
       const targetAlliance = prev.alliances.find(a => a.id === allianceId);
-      const members = targetAlliance?.members.map(mId => prev.players.find(p => p.id === mId)?.name).join(' & ');
+      const members = targetAlliance?.members
+        ?.map(mId => prev.players.find(p => p.id === mId)?.name || 'Unknown')
+        .join(' & ') || 'Unknown Terminals';
 
       return {
         ...prev,
@@ -1019,13 +1053,13 @@ export default function App() {
                 text: `🚩 NEUTRAL CLAIMED: ${attacker?.name} occupied ${target.name.toUpperCase()}! (${transit.count} garrison troops)`,
                 timestamp: Date.now()
               };
-            } else if (target.ownerId === transit.ownerId) {
-              // Friendly reinforcement
+            } else if (target.ownerId === transit.ownerId || areAllied(target.ownerId, transit.ownerId, alliances)) {
+              // Friendly/Ally reinforcement
               target.troops += transit.count;
               playSound.click();
               logs.push({
                 id: Math.random().toString(),
-                message: `${attacker?.name} reinforced ${target.name.toUpperCase()} with ${transit.count} troops.`,
+                message: `${attacker?.name} reinforced allied ${target.name.toUpperCase()} with ${transit.count} troops.`,
                 timestamp: new Date().toLocaleTimeString()
               });
             } else {
@@ -1223,11 +1257,11 @@ export default function App() {
       const activeBots = stateRef.current.players.filter(p => p.isBot && p.isAlive);
       
       activeBots.forEach(bot => {
-        // 1. Check for pending alliance invitations and accept some of them
+        // 1. Check for pending alliance invitations and accept them
         const pendingInvites = stateRef.current.alliances.filter(
           a => a.status === 'pending' && a.members.includes(bot.id) && a.proposedBy !== bot.id
         );
-        if (pendingInvites.length > 0 && Math.random() < 0.5) {
+        if (pendingInvites.length > 0) {
           const invite = pendingInvites[0];
           handleAcceptAlliance(invite.id);
           return; // Skip other actions this tick
@@ -1278,9 +1312,11 @@ export default function App() {
         }).filter(n => n.ownerId !== bot.id);
 
         if (targets.length > 0) {
-          // Filter targets: skip active allies and truces
+          // Filter targets: skip active allies, truces, and pending alliances
           const validTargets = targets.filter(t => 
-            !areAllied(t.ownerId, bot.id, stateRef.current.alliances) && !areInTruce(t.ownerId, bot.id, stateRef.current.alliances)
+            !areAllied(t.ownerId, bot.id, stateRef.current.alliances) && 
+            !areInTruce(t.ownerId, bot.id, stateRef.current.alliances) &&
+            !stateRef.current.alliances.some(a => a.status === 'pending' && t.ownerId && a.members.includes(t.ownerId) && a.members.includes(bot.id))
           );
 
           if (validTargets.length > 0) {
@@ -1315,8 +1351,11 @@ export default function App() {
   // Handle restarting match
   const handleReset = () => {
     setIsOffline(false);
-    setSupabaseCreds(null);
-    setChannel(null);
+    setRenderUrl(null);
+    if (socket) {
+      socket.close();
+    }
+    setSocket(null);
     setGameState({
       roomId: '',
       roomCode: '',
@@ -1335,15 +1374,15 @@ export default function App() {
   // Render orchestrator depending on current phase
   return (
     <div className="crt-container h-full w-full">
-      {gameState.phase === 'lobby' && !supabaseCreds && !isOffline && (
-        <SupabaseConfig
+      {gameState.phase === 'lobby' && !renderUrl && !isOffline && (
+        <RenderConfig
           onHostGame={handleHostGame}
           onJoinGame={handleJoinGame}
           onPlayOffline={handlePlayOffline}
         />
       )}
 
-      {gameState.phase === 'lobby' && (supabaseCreds || isOffline) && (
+      {gameState.phase === 'lobby' && (renderUrl || isOffline) && (
         <Lobby
           roomCode={gameState.roomCode}
           players={gameState.players}
