@@ -43,7 +43,7 @@ const playerColors = [
 export default function App() {
   const [renderUrl, setRenderUrl] = useState<string | null>(null);
   const [isOffline, setIsOffline] = useState<boolean>(false);
-  const [socket, setSocket] = useState<WebSocket | null>(null);
+  const socketRef = useRef<WebSocket | null>(null);
   const [showTutorial, setShowTutorial] = useState<boolean>(true);
   const [isConnecting, setIsConnecting] = useState<boolean>(false);
   const [connectionError, setConnectionError] = useState<string>('');
@@ -256,7 +256,7 @@ export default function App() {
       }));
     };
 
-    setSocket(ws);
+    socketRef.current = ws;
   };
 
   const joinOnlineLobby = (serverUrl: string, code: string, guest: Player) => {
@@ -328,7 +328,7 @@ export default function App() {
       }));
     };
 
-    setSocket(ws);
+    socketRef.current = ws;
   };
 
   const handleOnlinePlayerJoined = (payload: { player: Player }) => {
@@ -345,8 +345,8 @@ export default function App() {
 
       // Host syncs state to new joiners
       const myPlayer = stateRef.current.players.find(p => p.id === myPlayerId);
-      if (myPlayer?.isHost && socket && socket.readyState === WebSocket.OPEN) {
-        socket.send(JSON.stringify({
+      if (myPlayer?.isHost && socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+        socketRef.current.send(JSON.stringify({
           roomCode: stateRef.current.roomCode,
           event: 'state_sync',
           data: { state: { ...stateRef.current, players: updatedPlayers } }
@@ -366,8 +366,8 @@ export default function App() {
 
   // Helper to send game actions over broadcast channel
   const broadcastAction = (event: string, data: any) => {
-    if (socket && socket.readyState === WebSocket.OPEN) {
-      socket.send(JSON.stringify({
+    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+      socketRef.current.send(JSON.stringify({
         roomCode: stateRef.current.roomCode,
         senderId: myPlayerId,
         event: 'action',
@@ -380,6 +380,12 @@ export default function App() {
     const { event, data } = payload;
     
     switch (event) {
+      case 'phase_change':
+        updateGameState({
+          phase: data.phase,
+          logs: data.phase === 'preamble' ? addLog('Decrypting historical chronologies...') : stateRef.current.logs
+        });
+        break;
       case 'posture_submit':
         handlePostureChosen(payload.senderId, data.posture);
         break;
@@ -1412,10 +1418,10 @@ export default function App() {
   const handleReset = () => {
     setIsOffline(false);
     setRenderUrl(null);
-    if (socket) {
-      socket.close();
+    if (socketRef.current) {
+      socketRef.current.close();
     }
-    setSocket(null);
+    socketRef.current = null;
     setGameState({
       roomId: '',
       roomCode: '',
