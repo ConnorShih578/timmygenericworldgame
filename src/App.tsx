@@ -181,9 +181,20 @@ export default function App() {
       }));
     };
 
-    ws.onmessage = (event) => {
+    ws.onmessage = async (event) => {
       try {
-        const msg = JSON.parse(event.data);
+        let text = '';
+        if (event.data instanceof Blob) {
+          text = await event.data.text();
+        } else if (typeof event.data === 'string') {
+          text = event.data;
+        } else if (event.data instanceof ArrayBuffer) {
+          text = new TextDecoder().decode(event.data);
+        } else {
+          text = event.data.toString();
+        }
+
+        const msg = JSON.parse(text);
         if (msg.roomCode !== code) return; // Room filter!
 
         switch (msg.event) {
@@ -257,9 +268,20 @@ export default function App() {
       }));
     };
 
-    ws.onmessage = (event) => {
+    ws.onmessage = async (event) => {
       try {
-        const msg = JSON.parse(event.data);
+        let text = '';
+        if (event.data instanceof Blob) {
+          text = await event.data.text();
+        } else if (typeof event.data === 'string') {
+          text = event.data;
+        } else if (event.data instanceof ArrayBuffer) {
+          text = new TextDecoder().decode(event.data);
+        } else {
+          text = event.data.toString();
+        }
+
+        const msg = JSON.parse(text);
         if (msg.roomCode !== code) return; // Room filter!
 
         switch (msg.event) {
