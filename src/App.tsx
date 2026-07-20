@@ -45,6 +45,8 @@ export default function App() {
   const [isOffline, setIsOffline] = useState<boolean>(false);
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [showTutorial, setShowTutorial] = useState<boolean>(true);
+  const [isConnecting, setIsConnecting] = useState<boolean>(false);
+  const [connectionError, setConnectionError] = useState<string>('');
   
   // Core game state
   const [gameState, setGameState] = useState<GameState>({
@@ -74,12 +76,14 @@ export default function App() {
   };
 
   const handleHostGame = (url: string) => {
-    setRenderUrl(url);
+    setIsConnecting(true);
+    setConnectionError('');
     initializeOnlineLobby(url);
   };
 
   const handleJoinGame = (url: string, code: string) => {
-    setRenderUrl(url);
+    setIsConnecting(true);
+    setConnectionError('');
     joinOnlineLobby(url, code);
   };
 
@@ -166,6 +170,8 @@ export default function App() {
     const ws = new WebSocket(serverUrl);
     
     ws.onopen = () => {
+      setIsConnecting(false);
+      setRenderUrl(serverUrl);
       setGameState(prev => ({
         ...prev,
         roomId: `online_${code}`,
@@ -198,7 +204,16 @@ export default function App() {
       }
     };
 
+    ws.onerror = (err) => {
+      console.error('WebSocket connection error:', err);
+      setIsConnecting(false);
+      setConnectionError('Connection failed. Server might be booting up or offline.');
+      setRenderUrl(null);
+    };
+
     ws.onclose = () => {
+      setIsConnecting(false);
+      setRenderUrl(null);
       setGameState(prev => ({
         ...prev,
         logs: [...prev.logs, { id: 'disc', message: 'Connection to server lost.', timestamp: new Date().toLocaleTimeString() }]
@@ -224,6 +239,8 @@ export default function App() {
     const ws = new WebSocket(serverUrl);
     
     ws.onopen = () => {
+      setIsConnecting(false);
+      setRenderUrl(serverUrl);
       setGameState(prev => ({
         ...prev,
         roomId: `online_${code}`,
@@ -263,7 +280,16 @@ export default function App() {
       }
     };
 
+    ws.onerror = (err) => {
+      console.error('WebSocket connection error:', err);
+      setIsConnecting(false);
+      setConnectionError('Connection failed. Server might be booting up or offline.');
+      setRenderUrl(null);
+    };
+
     ws.onclose = () => {
+      setIsConnecting(false);
+      setRenderUrl(null);
       setGameState(prev => ({
         ...prev,
         logs: [...prev.logs, { id: 'disc', message: 'Connection to server lost.', timestamp: new Date().toLocaleTimeString() }]
@@ -1379,6 +1405,8 @@ export default function App() {
           onHostGame={handleHostGame}
           onJoinGame={handleJoinGame}
           onPlayOffline={handlePlayOffline}
+          isConnecting={isConnecting}
+          connectionError={connectionError}
         />
       )}
 

@@ -6,12 +6,16 @@ interface RenderConfigProps {
   onHostGame: (url: string) => void;
   onJoinGame: (url: string, code: string) => void;
   onPlayOffline: () => void;
+  isConnecting?: boolean;
+  connectionError?: string;
 }
 
 export const RenderConfig: React.FC<RenderConfigProps> = ({
   onHostGame,
   onJoinGame,
   onPlayOffline,
+  isConnecting = false,
+  connectionError = '',
 }) => {
   const [url, setUrl] = useState(
     localStorage.getItem('render_server_url') || 'wss://mygameserver-bsow.onrender.com/'
@@ -57,6 +61,8 @@ export const RenderConfig: React.FC<RenderConfigProps> = ({
     onJoinGame(url.trim(), roomCode.trim().toUpperCase());
   };
 
+  const activeError = errorMessage || connectionError;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90 p-4">
       {/* Scanning Radar Grid decoration */}
@@ -79,9 +85,13 @@ export const RenderConfig: React.FC<RenderConfigProps> = ({
           <div className="loader-bar mb-6"></div>
 
           {/* Action Log Message */}
-          {errorMessage ? (
+          {activeError ? (
             <div className="mb-6 p-2 border border-red-500 bg-red-950 bg-opacity-20 text-red-400 text-xs font-mono tracking-wider uppercase animate-pulse">
-              {errorMessage}
+              {activeError}
+            </div>
+          ) : isConnecting ? (
+            <div className="mb-6 p-2 border border-p1 bg-p1 bg-opacity-10 text-p1 text-xs font-mono tracking-wider uppercase animate-pulse">
+              CONNECTING TO SATELLITE COMMS SERVER... (Render spins down free services after inactivity. This may take up to 60s)
             </div>
           ) : (
             <p className="text-xs mb-6 text-p1 opacity-70 leading-relaxed font-mono">
@@ -99,14 +109,16 @@ export const RenderConfig: React.FC<RenderConfigProps> = ({
                 <input
                   type="text"
                   maxLength={5}
+                  disabled={isConnecting}
                   value={roomCode}
                   onChange={(e) => setRoomCode(e.target.value.toUpperCase().slice(0, 5))}
                   placeholder="ENTER 5-CHAR CODE"
-                  className="flex-1 bg-black border border-p1 text-p1 p-2 text-sm text-center font-bold tracking-widest focus:outline-none focus:ring-1 focus:ring-p1"
+                  className="flex-1 bg-black border border-p1 text-p1 p-2 text-sm text-center font-bold tracking-widest focus:outline-none focus:ring-1 focus:ring-p1 disabled:opacity-50"
                 />
                 <button
                   onClick={handleJoin}
-                  className="btn-radar px-6 py-2 text-xs font-semibold uppercase border-p1 text-p1"
+                  disabled={isConnecting}
+                  className="btn-radar px-6 py-2 text-xs font-semibold uppercase border-p1 text-p1 disabled:opacity-50"
                 >
                   Join Campaign
                 </button>
@@ -116,7 +128,8 @@ export const RenderConfig: React.FC<RenderConfigProps> = ({
             {/* Host Campaign */}
             <button
               onClick={handleHost}
-              className="w-full btn-radar py-3 text-sm font-semibold uppercase flex items-center justify-center gap-2 border-p1 text-p1"
+              disabled={isConnecting}
+              className="w-full btn-radar py-3 text-sm font-semibold uppercase flex items-center justify-center gap-2 border-p1 text-p1 disabled:opacity-50"
             >
               <Database className="w-4 h-4" /> Host New Server Sector (Render)
             </button>
@@ -124,7 +137,8 @@ export const RenderConfig: React.FC<RenderConfigProps> = ({
             {/* Offline Sandbox Fallback */}
             <button
               onClick={() => { playSound.ping(); onPlayOffline(); }}
-              className="w-full btn-radar py-3 text-sm font-semibold uppercase flex items-center justify-center gap-2 border-p2 text-p2"
+              disabled={isConnecting}
+              className="w-full btn-radar py-3 text-sm font-semibold uppercase flex items-center justify-center gap-2 border-p2 text-p2 disabled:opacity-50"
               style={{ '--border-color': 'var(--p2-color)', '--glow-color': 'var(--p2-color)' } as React.CSSProperties}
             >
               <Cpu className="w-4 h-4" /> Local Sandbox Simulator (VS Bots)
