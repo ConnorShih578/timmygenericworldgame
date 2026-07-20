@@ -78,13 +78,52 @@ export default function App() {
   const handleHostGame = (url: string) => {
     setIsConnecting(true);
     setConnectionError('');
+    
+    const host: Player = {
+      id: myPlayerId,
+      name: myPlayerName,
+      color: playerColors[0],
+      starsAssigned: null,
+      selectedCountryId: null,
+      posture: null,
+      isHost: true,
+      isBot: false,
+      isAlive: true,
+    };
+
+    setGameState(prev => ({
+      ...prev,
+      roomId: 'hosting',
+      players: [host]
+    }));
+
     initializeOnlineLobby(url);
   };
 
   const handleJoinGame = (url: string, code: string) => {
     setIsConnecting(true);
     setConnectionError('');
-    joinOnlineLobby(url, code);
+
+    const guest: Player = {
+      id: myPlayerId,
+      name: myPlayerName,
+      color: playerColors[1],
+      starsAssigned: null,
+      selectedCountryId: null,
+      posture: null,
+      isHost: false,
+      isBot: false,
+      isAlive: true,
+    };
+
+    setGameState(prev => ({
+      ...prev,
+      roomId: `online_${code}`,
+      roomCode: code,
+      players: [guest]
+    }));
+
+    joinOnlineLobby(url, code, guest);
   };
 
   // ----------------------------------------------------
@@ -154,19 +193,6 @@ export default function App() {
   // ----------------------------------------------------
   const initializeOnlineLobby = (serverUrl: string) => {
     const code = generateRoomCode();
-    
-    const host: Player = {
-      id: myPlayerId,
-      name: myPlayerName,
-      color: playerColors[0],
-      starsAssigned: null,
-      selectedCountryId: null,
-      posture: null,
-      isHost: true,
-      isBot: false,
-      isAlive: true,
-    };
-
     const ws = new WebSocket(serverUrl);
     
     ws.onopen = () => {
@@ -176,7 +202,6 @@ export default function App() {
         ...prev,
         roomId: `online_${code}`,
         roomCode: code,
-        players: [host],
         logs: [{ id: 'init', message: `Encrypted lobby hosting on ${code}`, timestamp: new Date().toLocaleTimeString() }]
       }));
     };
@@ -234,19 +259,7 @@ export default function App() {
     setSocket(ws);
   };
 
-  const joinOnlineLobby = (serverUrl: string, code: string) => {
-    const guest: Player = {
-      id: myPlayerId,
-      name: myPlayerName,
-      color: playerColors[1], // Temporarily set, host reassigns
-      starsAssigned: null,
-      selectedCountryId: null,
-      posture: null,
-      isHost: false,
-      isBot: false,
-      isAlive: true,
-    };
-
+  const joinOnlineLobby = (serverUrl: string, code: string, guest: Player) => {
     const ws = new WebSocket(serverUrl);
     
     ws.onopen = () => {
@@ -254,9 +267,6 @@ export default function App() {
       setRenderUrl(serverUrl);
       setGameState(prev => ({
         ...prev,
-        roomId: `online_${code}`,
-        roomCode: code,
-        players: [guest],
         logs: [{ id: 'init_join', message: `Connected to sector ${code}. Awaiting host data...`, timestamp: new Date().toLocaleTimeString() }]
       }));
 
@@ -334,7 +344,8 @@ export default function App() {
       });
 
       // Host syncs state to new joiners
-      if (myPlayerId === stateRef.current.players[0].id && socket && socket.readyState === WebSocket.OPEN) {
+      const myPlayer = stateRef.current.players.find(p => p.id === myPlayerId);
+      if (myPlayer?.isHost && socket && socket.readyState === WebSocket.OPEN) {
         socket.send(JSON.stringify({
           roomCode: stateRef.current.roomCode,
           event: 'state_sync',
@@ -346,7 +357,8 @@ export default function App() {
 
   const handleOnlineStateSync = (payload: { state: GameState }) => {
     // Only non-hosts follow state sync
-    const isMeHost = stateRef.current.players[0]?.id === myPlayerId;
+    const myPlayer = stateRef.current.players.find(p => p.id === myPlayerId);
+    const isMeHost = myPlayer?.isHost === true;
     if (!isMeHost) {
       setGameState(payload.state);
     }
@@ -1437,7 +1449,7 @@ export default function App() {
           roomCode={gameState.roomCode}
           players={gameState.players}
           currentUserId={myPlayerId}
-          isHost={gameState.players[0]?.id === myPlayerId}
+          isHost={gameState.players.find(p => p.id === myPlayerId)?.isHost === true}
           selectedEraId={gameState.eraId}
           onSelectEra={(eraId) => updateGameState({ eraId })}
           onAddBot={handleAddBot}
