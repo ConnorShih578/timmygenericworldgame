@@ -10,6 +10,22 @@ interface RenderConfigProps {
   connectionError?: string;
 }
 
+const sanitizeWsUrl = (url: string): string => {
+  let cleaned = url.trim();
+  if (cleaned.startsWith('http://')) {
+    cleaned = cleaned.replace('http://', 'ws://');
+  } else if (cleaned.startsWith('https://')) {
+    cleaned = cleaned.replace('https://', 'wss://');
+  } else if (!cleaned.startsWith('ws://') && !cleaned.startsWith('wss://')) {
+    if (cleaned.includes('localhost') || cleaned.includes('127.0.0.1')) {
+      cleaned = 'ws://' + cleaned;
+    } else {
+      cleaned = 'wss://' + cleaned;
+    }
+  }
+  return cleaned;
+};
+
 export const RenderConfig: React.FC<RenderConfigProps> = ({
   onHostGame,
   onJoinGame,
@@ -17,9 +33,10 @@ export const RenderConfig: React.FC<RenderConfigProps> = ({
   isConnecting = false,
   connectionError = '',
 }) => {
-  const [url, setUrl] = useState(
-    localStorage.getItem('render_server_url') || 'wss://mygameserver-bsow.onrender.com/'
-  );
+  const [url, setUrl] = useState(() => {
+    const saved = localStorage.getItem('render_server_url') || 'wss://mygameserver-bsow.onrender.com/';
+    return sanitizeWsUrl(saved);
+  });
   const [roomCode, setRoomCode] = useState('');
   const [showSettings, setShowSettings] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -29,7 +46,9 @@ export const RenderConfig: React.FC<RenderConfigProps> = ({
   const handleSaveSettings = (e: React.FormEvent) => {
     e.preventDefault();
     if (url.trim()) {
-      localStorage.setItem('render_server_url', url.trim());
+      const sanitized = sanitizeWsUrl(url);
+      setUrl(sanitized);
+      localStorage.setItem('render_server_url', sanitized);
       setShowSettings(false);
       setErrorMessage('');
       playSound.ping();
@@ -42,8 +61,10 @@ export const RenderConfig: React.FC<RenderConfigProps> = ({
       playSound.klaxon();
       return;
     }
+    const sanitized = sanitizeWsUrl(url);
+    setUrl(sanitized);
     playSound.ping();
-    onHostGame(url.trim());
+    onHostGame(sanitized);
   };
 
   const handleJoin = () => {
@@ -57,8 +78,10 @@ export const RenderConfig: React.FC<RenderConfigProps> = ({
       playSound.klaxon();
       return;
     }
+    const sanitized = sanitizeWsUrl(url);
+    setUrl(sanitized);
     playSound.ping();
-    onJoinGame(url.trim(), roomCode.trim().toUpperCase());
+    onJoinGame(sanitized, roomCode.trim().toUpperCase());
   };
 
   const activeError = errorMessage || connectionError;
