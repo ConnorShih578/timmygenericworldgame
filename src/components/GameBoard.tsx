@@ -280,12 +280,12 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         
         {/* Left Side: Logs and Alliances */}
         <div 
-          className={`${leftCollapsed ? 'w-0 border-r-0' : 'w-80 border-r'} border-p1 flex flex-col bg-black bg-opacity-70 z-10 h-full relative transition-all duration-300`}
+          className={`${leftCollapsed ? 'w-0 border-r-0' : 'w-80 border-r'} border-p1 flex flex-col bg-black bg-opacity-70 z-10 h-full relative transition-all duration-300 overflow-visible`}
         >
           {/* Collapse Handle Tab */}
           <button
             onClick={() => { if (soundEnabled) playSound.click(); setLeftCollapsed(!leftCollapsed); }}
-            className="absolute top-1/2 -right-4 transform -translate-y-1/2 bg-black border border-p1 text-p1 p-1 text-[10px] z-20 cursor-pointer hover:bg-p1 hover:text-black transition-colors flex items-center justify-center rounded-r"
+            className="absolute top-1/2 left-full transform -translate-y-1/2 bg-black border border-p1 text-p1 p-1 text-[10px] z-20 cursor-pointer hover:bg-p1 hover:text-black transition-colors flex items-center justify-center rounded-r"
             style={{ height: '60px', width: '16px', borderLeft: 'none' }}
             title={leftCollapsed ? "EXPAND_COALITIONS" : "COLLAPSE_COALITIONS"}
           >
@@ -967,12 +967,12 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
         {/* Right Side: Control Actions & Details */}
         <div 
-          className={`${rightCollapsed ? 'w-0 border-l-0' : 'w-80 border-l'} border-p1 flex flex-col justify-between bg-black bg-opacity-70 z-10 h-full relative transition-all duration-300`}
+          className={`${rightCollapsed ? 'w-0 border-l-0' : 'w-80 border-l'} border-p1 flex flex-col justify-between bg-black bg-opacity-70 z-10 h-full relative transition-all duration-300 overflow-visible`}
         >
           {/* Collapse Handle Tab */}
           <button
             onClick={() => { if (soundEnabled) playSound.click(); setRightCollapsed(!rightCollapsed); }}
-            className="absolute top-1/2 -left-4 transform -translate-y-1/2 bg-black border border-p1 text-p1 p-1 text-[10px] z-20 cursor-pointer hover:bg-p1 hover:text-black transition-colors flex items-center justify-center rounded-l"
+            className="absolute top-1/2 right-full transform -translate-y-1/2 bg-black border border-p1 text-p1 p-1 text-[10px] z-20 cursor-pointer hover:bg-p1 hover:text-black transition-colors flex items-center justify-center rounded-l"
             style={{ height: '60px', width: '16px', borderRight: 'none' }}
             title={rightCollapsed ? "EXPAND_COMMANDS" : "COLLAPSE_COMMANDS"}
           >
