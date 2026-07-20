@@ -95,13 +95,16 @@ export const RenderConfig: React.FC<RenderConfigProps> = ({
         
         <div>
           {/* Header */}
-          <div className="flex justify-between items-center mb-2">
-            <h1 className="text-2xl font-bold glow-text tracking-widest text-p1">
-              TIMMY_WORLD_GAME
-            </h1>
-            <div className="text-[10px] uppercase border px-2 py-0.5 text-p1 border-p1 animate-pulse flex items-center gap-1">
-              {hasCreds ? <Wifi className="w-3 h-3 text-p1" /> : <WifiOff className="w-3 h-3 text-p2" />}
-              {hasCreds ? 'NET_READY' : 'LOCAL_ONLY'}
+          <div className="flex flex-col items-center mb-6">
+            <img src="/logo.png" alt="TIMMY WORLD GAME LOGO" className="w-24 h-24 object-contain mb-4 glow-logo border border-p1 border-opacity-30 p-1 bg-black bg-opacity-60" />
+            <div className="flex justify-between items-center w-full">
+              <h1 className="text-2xl font-bold glow-text tracking-widest text-p1">
+                TIMMY_WORLD_GAME
+              </h1>
+              <div className="text-[10px] uppercase border px-2 py-0.5 text-p1 border-p1 animate-pulse flex items-center gap-1">
+                {hasCreds ? <Wifi className="w-3 h-3 text-p1" /> : <WifiOff className="w-3 h-3 text-p2" />}
+                {hasCreds ? 'NET_READY' : 'LOCAL_ONLY'}
+              </div>
             </div>
           </div>
           

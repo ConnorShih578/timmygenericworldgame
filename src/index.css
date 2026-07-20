@@ -517,3 +517,8 @@ body {
   .header-title { display: none !important; }
 }
 
+.glow-logo {
+  box-shadow: 0 0 15px rgba(51, 255, 102, 0.2);
+  filter: drop-shadow(0 0 10px rgba(51, 255, 102, 0.35));
+}
+
