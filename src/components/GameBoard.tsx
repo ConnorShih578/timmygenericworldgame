@@ -3,7 +3,7 @@ import type { Player, CountryNode, BorderConnection, TransitTroops, Alliance, Ga
 import { COUNTRY_PATHS, DETAILED_CONTINENTS } from '../constants/countryPaths';
 import { playSound } from '../utils/audio';
 import { canReachNode } from '../utils/pathfinding';
-import { Shield, Target, Award, Eye, RefreshCw, Volume2, VolumeX, AlertTriangle, Compass, HelpCircle } from 'lucide-react';
+import { Shield, Target, Award, Eye, RefreshCw, Volume2, VolumeX, AlertTriangle, Compass, HelpCircle, Keyboard } from 'lucide-react';
 
 interface GameBoardProps {
   players: Player[];
@@ -61,6 +61,88 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   }>>([]);
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
   const [cursorPos, setCursorPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+
+  // Desktop Controls state
+  const [showHotkeyHelp, setShowHotkeyHelp] = useState<boolean>(false);
+
+  // Keyboard shortcuts listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't intercept if user is typing in text field
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes((e.target as HTMLElement)?.tagName)) return;
+
+      const key = e.key.toLowerCase();
+
+      if (e.key === 'Escape' || e.key === ' ') {
+        e.preventDefault();
+        setSelectedNodeId(null);
+        setTargetActionMode('none');
+      } else if (key === 'a') {
+        e.preventDefault();
+        if (selectedNodeId) {
+          const sNode = nodes.find(n => n.id === selectedNodeId);
+          if (sNode && sNode.ownerId === currentUserId) {
+            setTargetActionMode(prev => (prev === 'attack' ? 'none' : 'attack'));
+            if (soundEnabled) playSound.click();
+          }
+        }
+      } else if (key === 's') {
+        e.preventDefault();
+        if (selectedNodeId) {
+          const sNode = nodes.find(n => n.id === selectedNodeId);
+          if (sNode && sNode.ownerId === currentUserId) {
+            setTargetActionMode(prev => (prev === 'explore' ? 'none' : 'explore'));
+            if (soundEnabled) playSound.click();
+          }
+        }
+      } else if (key === 'f') {
+        e.preventDefault();
+        if (selectedNodeId) {
+          const sNode = nodes.find(n => n.id === selectedNodeId);
+          if (sNode && sNode.ownerId === currentUserId && sNode.troops > 1) {
+            onFortifyToggle(selectedNodeId);
+            if (soundEnabled) playSound.ping();
+          }
+        }
+      } else if (['1', '2', '3', '4'].includes(key)) {
+        const pctMap: Record<string, number> = { '1': 25, '2': 50, '3': 75, '4': 100 };
+        setTroopPercentage(pctMap[key]);
+        if (soundEnabled) playSound.click();
+      } else if (key === 'c') {
+        e.preventDefault();
+        const myCapital = nodes.find(n => n.ownerId === currentUserId && n.type === 'capital') || nodes.find(n => n.ownerId === currentUserId);
+        if (myCapital) {
+          setSelectedNodeId(myCapital.id);
+          setPan({ x: 500 - myCapital.x, y: 350 - myCapital.y });
+          setZoom(1.5);
+          if (soundEnabled) playSound.ping();
+        }
+      } else if (e.key === 'Tab') {
+        e.preventDefault();
+        const myNodes = nodes.filter(n => n.ownerId === currentUserId);
+        if (myNodes.length > 0) {
+          const currentIndex = myNodes.findIndex(n => n.id === selectedNodeId);
+          const nextIndex = e.shiftKey
+            ? (currentIndex - 1 + myNodes.length) % myNodes.length
+            : (currentIndex + 1) % myNodes.length;
+          setSelectedNodeId(myNodes[nextIndex].id);
+          if (soundEnabled) playSound.click();
+        }
+      } else if (e.key === '+' || e.key === '=') {
+        setZoom(prev => Math.min(4, prev + 0.25));
+      } else if (e.key === '-') {
+        setZoom(prev => Math.max(0.75, prev - 0.25));
+      } else if (key === '0') {
+        setZoom(1);
+        setPan({ x: 0, y: 0 });
+      } else if (key === 'h' || key === '?') {
+        setShowHotkeyHelp(prev => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedNodeId, nodes, currentUserId, soundEnabled, onFortifyToggle]);
 
   const startPayloadAnimation = (fromId: string, toId: string, isScout: boolean, count: number, color: string) => {
     const fromN = nodes.find(n => n.id === fromId);
@@ -273,6 +355,15 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Keyboard Shortcuts Cheat Sheet Toggle */}
+          <button
+            onClick={() => setShowHotkeyHelp(!showHotkeyHelp)}
+            className="btn-radar p-2 rounded flex items-center justify-center border-p1 text-p1 hover:bg-p1 hover:bg-opacity-20"
+            title="KEYBOARD SHORTCUTS [H]"
+          >
+            <Keyboard className="w-4 h-4" />
+          </button>
+
           {/* Help Briefing Toggle */}
           <button
             onClick={onLaunchTutorial}
@@ -434,68 +525,35 @@ export const GameBoard: React.FC<GameBoardProps> = ({
             </div>
           )}
 
-          {/* Action Mode Guidance Badge (Top Left Side, Compact) */}
-          {targetActionMode !== 'none' && (
-            <div className="fixed top-20 left-6 z-40 bg-black border border-p1 px-3 py-1.5 shadow-xl flex items-center gap-3 rounded text-[11px] font-mono">
-              <div className="font-bold uppercase flex items-center gap-1.5">
-                {targetActionMode === 'attack' ? (
-                  <span className="text-p1 flex items-center gap-1">
-                    <Target className="w-3.5 h-3.5 text-p1" /> ATTACK ({troopPercentage}%): Click target!
-                  </span>
-                ) : (
-                  <span className="text-p2 flex items-center gap-1">
-                    <Compass className="w-3.5 h-3.5 text-p2" /> SCOUT MODE: Click target!
-                  </span>
-                )}
-              </div>
-
-              {targetActionMode === 'attack' && (
-                <div className="flex gap-1 border-l border-p1 border-opacity-30 pl-2">
-                  {[25, 50, 75, 100].map(pct => (
-                    <button
-                      key={pct}
-                      onClick={() => setTroopPercentage(pct)}
-                      className={`px-1.5 py-0.2 text-[9px] border ${
-                        troopPercentage === pct ? 'border-p1 bg-p1 text-black font-bold' : 'border-p1 text-p1'
-                      }`}
-                    >
-                      {pct}%
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              <button
-                onClick={() => setTargetActionMode('none')}
-                className="px-1.5 py-0.2 text-[9px] border border-p2 text-p2 uppercase font-semibold hover:bg-p2 hover:text-black ml-1 rounded"
-              >
-                ✕
-              </button>
-            </div>
-          )}
-
           {/* Zoom / View Control Console (Floating Top-Left) */}
-          <div className="absolute top-32 left-6 z-40 flex flex-col gap-1 border border-p1 border-opacity-40 p-1 bg-black bg-opacity-70 rounded">
+          <div className="absolute top-6 left-6 z-40 flex flex-col gap-1 border border-p1 border-opacity-40 p-1 bg-black bg-opacity-70 rounded">
             <button
               onClick={() => setZoom(prev => Math.min(4, prev + 0.25))}
               className="w-7 h-7 bg-black border border-p1 text-p1 font-bold text-sm flex items-center justify-center hover:bg-p1 hover:text-black rounded"
-              title="Zoom In"
+              title="Zoom In (+)"
             >
               +
             </button>
             <button
               onClick={() => setZoom(prev => Math.max(0.75, prev - 0.25))}
               className="w-7 h-7 bg-black border border-p1 text-p1 font-bold text-sm flex items-center justify-center hover:bg-p1 hover:text-black rounded"
-              title="Zoom Out"
+              title="Zoom Out (-)"
             >
               −
             </button>
             <button
               onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }}
               className="w-7 h-7 bg-black border border-p1 text-p1 text-[10px] flex items-center justify-center hover:bg-p1 hover:text-black rounded"
-              title="Reset View"
+              title="Reset View (0)"
             >
               ⟲
+            </button>
+            <button
+              onClick={() => setShowHotkeyHelp(prev => !prev)}
+              className="w-7 h-7 bg-black border border-p1 text-p1 text-[10px] flex items-center justify-center hover:bg-p1 hover:text-black rounded font-bold"
+              title="Keyboard Shortcuts (H)"
+            >
+              ⌨
             </button>
           </div>
 
@@ -505,6 +563,17 @@ export const GameBoard: React.FC<GameBoardProps> = ({
             viewBox="0 0 1000 700" 
             className="max-w-full max-h-full relative z-2 select-none cursor-grab active:cursor-grabbing touch-none"
             style={{ width: 'auto', height: 'auto', aspectRatio: '1000 / 700' }}
+            onWheel={(e) => {
+              e.preventDefault();
+              const zoomFactor = e.deltaY < 0 ? 1.15 : 0.85;
+              setZoom(prev => Math.min(4, Math.max(0.75, prev * zoomFactor)));
+            }}
+            onContextMenu={(e) => {
+              e.preventDefault();
+              setSelectedNodeId(null);
+              setTargetActionMode('none');
+              if (soundEnabled) playSound.click();
+            }}
             onPointerDown={(e) => {
               if ((e.target as SVGElement).tagName === 'svg' || (e.target as SVGElement).id === 'map-bg') {
                 setIsDragging(true);
@@ -1172,6 +1241,73 @@ export const GameBoard: React.FC<GameBoardProps> = ({
               className="w-full btn-radar py-2 text-sm font-semibold uppercase flex items-center justify-center gap-2 border-p1"
             >
               <RefreshCw className="w-4 h-4" /> Start New Deployment
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 5. Desktop Keyboard Shortcuts Modal */}
+      {showHotkeyHelp && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80 p-4 font-mono">
+          <div className="radar-panel max-w-lg w-full p-6 glow-border border-p1 relative text-p1">
+            <button
+              onClick={() => setShowHotkeyHelp(false)}
+              className="absolute top-4 right-4 text-p1 hover:text-white text-lg font-bold"
+            >
+              ✕
+            </button>
+            
+            <div className="flex items-center gap-2 mb-4 border-b border-p1 pb-3">
+              <Keyboard className="w-5 h-5 text-p1" />
+              <h2 className="text-lg font-bold uppercase tracking-wider text-white">
+                TACTICAL KEYBOARD COMMANDS
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 text-xs mb-6">
+              <div className="p-2 border border-p1 border-opacity-40 bg-black flex justify-between items-center">
+                <span className="opacity-70">ATTACK MODE</span>
+                <kbd className="px-2 py-0.5 bg-p1 bg-opacity-20 border border-p1 text-p1 font-bold rounded">A</kbd>
+              </div>
+              <div className="p-2 border border-p1 border-opacity-40 bg-black flex justify-between items-center">
+                <span className="opacity-70">SCOUT MODE</span>
+                <kbd className="px-2 py-0.5 bg-p1 bg-opacity-20 border border-p1 text-p1 font-bold rounded">S</kbd>
+              </div>
+              <div className="p-2 border border-p1 border-opacity-40 bg-black flex justify-between items-center">
+                <span className="opacity-70">TOGGLE FORTIFY</span>
+                <kbd className="px-2 py-0.5 bg-p1 bg-opacity-20 border border-p1 text-p1 font-bold rounded">F</kbd>
+              </div>
+              <div className="p-2 border border-p1 border-opacity-40 bg-black flex justify-between items-center">
+                <span className="opacity-70">DESELECT / CANCEL</span>
+                <kbd className="px-2 py-0.5 bg-p1 bg-opacity-20 border border-p1 text-p1 font-bold rounded">ESC / SPACE</kbd>
+              </div>
+              <div className="p-2 border border-p1 border-opacity-40 bg-black flex justify-between items-center">
+                <span className="opacity-70">TROOP RATIO (25%-100%)</span>
+                <kbd className="px-2 py-0.5 bg-p1 bg-opacity-20 border border-p1 text-p1 font-bold rounded">1 - 4</kbd>
+              </div>
+              <div className="p-2 border border-p1 border-opacity-40 bg-black flex justify-between items-center">
+                <span className="opacity-70">CAPITAL FOCUS</span>
+                <kbd className="px-2 py-0.5 bg-p1 bg-opacity-20 border border-p1 text-p1 font-bold rounded">C</kbd>
+              </div>
+              <div className="p-2 border border-p1 border-opacity-40 bg-black flex justify-between items-center">
+                <span className="opacity-70">CYCLE OWNED NODES</span>
+                <kbd className="px-2 py-0.5 bg-p1 bg-opacity-20 border border-p1 text-p1 font-bold rounded">TAB</kbd>
+              </div>
+              <div className="p-2 border border-p1 border-opacity-40 bg-black flex justify-between items-center">
+                <span className="opacity-70">ZOOM IN / OUT / RESET</span>
+                <kbd className="px-2 py-0.5 bg-p1 bg-opacity-20 border border-p1 text-p1 font-bold rounded">+ / - / 0</kbd>
+              </div>
+            </div>
+
+            <div className="text-[10px] text-p1 opacity-60 border-t border-p1 pt-3 uppercase leading-relaxed">
+              💡 PRO-TIP: Click an owned territory node, then click a target node or use keys A/S/F to command troops! Right-click anywhere to cancel.
+            </div>
+
+            <button
+              onClick={() => setShowHotkeyHelp(false)}
+              className="w-full mt-4 btn-radar py-2 text-xs uppercase font-semibold border-p1"
+            >
+              CLOSE COMMAND SHEET
             </button>
           </div>
         </div>
