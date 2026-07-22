@@ -289,6 +289,60 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     a => a.status === 'pending' && a.members.includes(currentUserId) && a.proposedBy !== currentUserId
   );
 
+  const eraTitles = (() => {
+    switch (eraId) {
+      case 'roman':
+        return {
+          gameTitle: 'CONQUEST_OF_ROME',
+          telemetry: 'CHRONICLES_OF_ROME',
+          coalitions: 'LEGION_ALLIANCES',
+          invitation: 'SENATE_ALLIANCE_PROPOSAL',
+          briefing: 'CENTURION_BRIEFING'
+        };
+      case 'napoleonic':
+        return {
+          gameTitle: 'GRAND_EMPIRE_WAR',
+          telemetry: 'MARSHAL_DISPATCH_FEED',
+          coalitions: 'DIPLOMATIC_COALITIONS',
+          invitation: 'ROYAL_COALITION_OFFER',
+          briefing: 'MARSHAL_BRIEFING'
+        };
+      case 'british_empire':
+        return {
+          gameTitle: 'PAX_BRITANNICA',
+          telemetry: 'TELEGRAPH_DESPATCHES',
+          coalitions: 'COLONIAL_LEAGUES',
+          invitation: 'IMPERIAL_TREATY_PROPOSAL',
+          briefing: 'GOVERNOR_BRIEFING'
+        };
+      case 'ww1':
+        return {
+          gameTitle: 'THE_GREAT_WAR',
+          telemetry: 'FIELD_TELEGRAPH_LOGS',
+          coalitions: 'ENTENTE_&_ALLIANCES',
+          invitation: 'FIELD_DISPATCH_TREATY',
+          briefing: 'STAFF_OFFICER_BRIEFING'
+        };
+      case 'ww2':
+        return {
+          gameTitle: 'WORLD_WAR_II_COMMAND',
+          telemetry: 'BUNKER_TELEMETRY_FEED',
+          coalitions: 'ALLIED_&_AXIS_BLOCS',
+          invitation: 'HIGH_COMMAND_PACT',
+          briefing: 'BUNKER_BRIEFING'
+        };
+      case 'modern':
+      default:
+        return {
+          gameTitle: 'CYBER_WAR_COMMAND',
+          telemetry: 'TELEMETRY_FEED',
+          coalitions: 'ACTIVE_COALITIONS',
+          invitation: 'ALLIANCE_INVITATION',
+          briefing: 'TACTICAL_BRIEFING'
+        };
+    }
+  })();
+
   return (
     <div className="h-screen w-screen bg-[#050806] flex flex-col overflow-hidden text-p1 relative select-none">
       
@@ -300,7 +354,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
             alt="Era Logo" 
             className="w-9 h-9 object-contain glow-logo border border-p1 border-opacity-30 p-0.5 bg-black bg-opacity-60" 
           />
-          <span className="font-bold glow-text tracking-widest text-lg header-title">TIMMY_WORLD_GAME</span>
+          <span className="font-bold glow-text tracking-widest text-lg header-title">{eraTitles.gameTitle}</span>
           <div className="loader-bar w-24 header-title"></div>
         </div>
 
@@ -375,7 +429,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
           <button
             onClick={onLaunchTutorial}
             className="btn-radar p-2 rounded flex items-center justify-center border-p1 text-p1"
-            title="LAUNCH TACTICAL BRIEFING"
+            title={eraTitles.briefing}
           >
             <HelpCircle className="w-4 h-4" />
           </button>
@@ -415,14 +469,14 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                 {activeRequests.length > 0 && (
                   <div className="p-4 border-b border-p2 bg-red-950 bg-opacity-10 flex-shrink-0">
                     <h4 className="text-xs font-bold text-p2 uppercase tracking-widest mb-3 flex items-center gap-2">
-                      <AlertTriangle className="w-4 h-4" /> ALLIANCE_INVITATION
+                      <AlertTriangle className="w-4 h-4" /> {eraTitles.invitation}
                     </h4>
                     {activeRequests.map(req => {
                       const sender = players.find(p => p.id === req.proposedBy);
                       return (
                         <div key={req.id} className="p-3 bg-black border border-p2 space-y-3">
                           <span className="text-xs leading-relaxed text-p2">
-                            Terminal <strong style={{ color: sender?.color }}>{sender?.name}</strong> proposes a formal military Coalition.
+                            Commander <strong style={{ color: sender?.color }}>{sender?.name}</strong> proposes a formal military Coalition.
                           </span>
                           <div className="flex gap-2">
                             <button
@@ -446,7 +500,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
                 {/* Active Alliances Panel */}
                 <div className="p-4 border-b border-p1 flex flex-col">
-                  <h3 className="text-xs uppercase text-p1 opacity-60 mb-2 tracking-wider">ACTIVE_COALITIONS</h3>
+                  <h3 className="text-xs uppercase text-p1 opacity-60 mb-2 tracking-wider">{eraTitles.coalitions}</h3>
                   <div className="space-y-2">
                     {alliances.filter(a => a.status === 'active' || a.status === 'truce').map(alliance => {
                       const membersList = alliance.members.map(mId => players.find(p => p.id === mId));
@@ -497,8 +551,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
               {/* Game Logs (Real-time telemetry feeds) */}
               <div className="h-64 p-4 border-t border-p1 flex flex-col justify-between flex-shrink-0">
-                <h3 className="text-xs uppercase text-p1 opacity-60 mb-2 tracking-wider">TELEMETRY_FEED</h3>
-                <div className="flex-1 overflow-y-auto custom-scrollbar space-y-1 font-mono text-[10px] leading-relaxed pr-2">
+                <h3 className="text-xs uppercase text-p1 opacity-60 mb-2 tracking-wider">{eraTitles.telemetry}</h3>
+                <div className="flex-1 overflow-y-auto custom-scrollbar space-y-1 text-[10px] leading-relaxed pr-2">
                   {logs.map((log) => (
                     <div key={log.id} className="border-b border-p1 border-opacity-10 pb-1">
                       <span className="opacity-40">[{log.timestamp}]</span> {log.message}
@@ -513,9 +567,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
         {/* 3. Central Map Grid */}
         <div className="flex-1 relative flex items-center justify-center overflow-hidden">
-          {/* Radar background grid */}
-          <div className="radar-grid"></div>
-          <div className="radar-sweep"></div>
+          {/* Era background grid & ambient animations */}
+          <div className="era-bg-grid"></div>
+          <div className="era-bg-animation"></div>
 
           {/* On-Screen Combat Toast (Top Right Side, Compact) */}
           {lastCombatResult && (
@@ -941,7 +995,11 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                       fontWeight="bold"
                       textAnchor="middle"
                     >
-                      {node.type === 'capital' ? '★ CAP' : node.type === 'military_base' ? '⚔ BASE' : '🏙 CIT'}
+                      {node.type === 'capital' 
+                        ? (eraId === 'roman' ? '🏛 CAP' : eraId === 'napoleonic' ? '♔ CAP' : eraId === 'british_empire' ? '⚙ CAP' : '★ CAP') 
+                        : node.type === 'military_base' 
+                        ? (eraId === 'roman' ? '🛡 FORT' : eraId === 'ww1' ? '⛺ BASE' : '⚔ BASE') 
+                        : '🏙 CIT'}
                     </text>
                   </g>
 

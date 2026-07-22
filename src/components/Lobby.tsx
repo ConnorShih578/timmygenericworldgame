@@ -50,10 +50,15 @@ export const Lobby: React.FC<LobbyProps> = ({
           <div>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold glow-text tracking-widest text-p1">
-                LOBBY_TERMINALS
+                {selectedEraId === 'roman' ? 'ROMAN_SENATE_CHAMBER' :
+                 selectedEraId === 'napoleonic' ? 'ROYAL_COUNCIL_CHAMBER' :
+                 selectedEraId === 'british_empire' ? 'IMPERIAL_WAR_OFFICE' :
+                 selectedEraId === 'ww1' ? 'FIELD_DISPATCH_LOBBY' :
+                 selectedEraId === 'ww2' ? 'BUNKER_STAFF_LOBBY' :
+                 'CYBER_COMMAND_LOBBY'}
               </h2>
               <div className="text-xs uppercase bg-opacity-20 bg-p1 border border-p1 px-2 py-0.5 text-p1">
-                ONLINE: {players.length}/4
+                COMMANDERS: {players.length}/4
               </div>
             </div>
             
