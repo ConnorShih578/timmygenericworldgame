@@ -1,16 +1,121 @@
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700&display=swap');
 
 :root {
-  --bg-color: #040705;
-  --panel-bg: rgba(3, 6, 4, 0.99);
-  --border-color: #1a3821;
-  --glow-color: #33ff66;
+  /* Default Theme (Modern Era - Tactical Cyan) */
+  --bg-color: #020708;
+  --panel-bg: rgba(1, 4, 6, 0.99);
+  --border-color: #0a2f35;
+  --border-color-rgb: 10, 47, 53;
+  --glow-color: #00e5ff;
+  --glow-color-rgb: 0, 229, 255;
+  --neutral-color: #384d50;
+  
+  --continent-fill: #010f13;
+  --continent-stroke: #092c33;
+  --country-unclaimed-fill: rgba(0, 229, 255, 0.015);
+  --country-unclaimed-stroke: rgba(0, 229, 255, 0.12);
+  --connection-core: #0d5460;
   
   --p1-color: #33ff66; /* Phosphor Green */
   --p2-color: #ffb700; /* Distress Amber */
   --p3-color: #00e5ff; /* Tactical Cyan */
   --p4-color: #e040fb; /* Recon Violet */
-  --neutral-color: #3e4e43; /* Neutral grey-green */
+}
+
+/* Modern Era (Tactical Cyan HUD) */
+.theme-modern {
+  --bg-color: #020708;
+  --panel-bg: rgba(1, 4, 6, 0.99);
+  --border-color: #0a2f35;
+  --border-color-rgb: 10, 47, 53;
+  --glow-color: #00e5ff;
+  --glow-color-rgb: 0, 229, 255;
+  --neutral-color: #384d50;
+  --continent-fill: #010f13;
+  --continent-stroke: #092c33;
+  --country-unclaimed-fill: rgba(0, 229, 255, 0.015);
+  --country-unclaimed-stroke: rgba(0, 229, 255, 0.12);
+  --connection-core: #0d5460;
+}
+
+/* World War II (Classic Green Phosphor Radar) */
+.theme-ww2 {
+  --bg-color: #040705;
+  --panel-bg: rgba(3, 6, 4, 0.99);
+  --border-color: #1a3821;
+  --border-color-rgb: 26, 56, 33;
+  --glow-color: #33ff66;
+  --glow-color-rgb: 51, 255, 102;
+  --neutral-color: #3e4e43;
+  --continent-fill: #05140b;
+  --continent-stroke: #1c4527;
+  --country-unclaimed-fill: rgba(51, 255, 102, 0.015);
+  --country-unclaimed-stroke: rgba(51, 255, 102, 0.12);
+  --connection-core: #2d683d;
+}
+
+/* World War I (Distress Amber / Vintage Sepia Console) */
+.theme-ww1 {
+  --bg-color: #080502;
+  --panel-bg: rgba(6, 4, 2, 0.99);
+  --border-color: #38240a;
+  --border-color-rgb: 56, 36, 10;
+  --glow-color: #ffb700;
+  --glow-color-rgb: 255, 183, 0;
+  --neutral-color: #4e4033;
+  --continent-fill: #140d05;
+  --continent-stroke: #332109;
+  --country-unclaimed-fill: rgba(255, 183, 0, 0.015);
+  --country-unclaimed-stroke: rgba(255, 183, 0, 0.12);
+  --connection-core: #5c3c13;
+}
+
+/* Pax Britannica (Warm Copper / Industrial Victorian Terminal) */
+.theme-british_empire {
+  --bg-color: #060504;
+  --panel-bg: rgba(4, 3, 2, 0.99);
+  --border-color: #2f2015;
+  --border-color-rgb: 47, 32, 21;
+  --glow-color: #e59866;
+  --glow-color-rgb: 229, 152, 102;
+  --neutral-color: #4c3f35;
+  --continent-fill: #120e0a;
+  --continent-stroke: #2e1d10;
+  --country-unclaimed-fill: rgba(229, 152, 102, 0.015);
+  --country-unclaimed-stroke: rgba(229, 152, 102, 0.12);
+  --connection-core: #4a311d;
+}
+
+/* Napoleonic Era (Royal Brass / Imperial Gold Console) */
+.theme-napoleonic {
+  --bg-color: #060502;
+  --panel-bg: rgba(4, 3, 1, 0.99);
+  --border-color: #33270d;
+  --border-color-rgb: 51, 39, 13;
+  --glow-color: #ffd700;
+  --glow-color-rgb: 255, 215, 0;
+  --neutral-color: #484133;
+  --continent-fill: #141108;
+  --continent-stroke: #2d230b;
+  --country-unclaimed-fill: rgba(255, 215, 0, 0.015);
+  --country-unclaimed-stroke: rgba(255, 215, 0, 0.12);
+  --connection-core: #4f3b14;
+}
+
+/* Roman Times (Terracotta Red / Ancient Legionary Shield) */
+.theme-roman {
+  --bg-color: #070302;
+  --panel-bg: rgba(5, 2, 1, 0.99);
+  --border-color: #3d1c15;
+  --border-color-rgb: 61, 28, 21;
+  --glow-color: #ff5733;
+  --glow-color-rgb: 255, 87, 51;
+  --neutral-color: #503733;
+  --continent-fill: #160c0a;
+  --continent-stroke: #381912;
+  --country-unclaimed-fill: rgba(255, 87, 51, 0.015);
+  --country-unclaimed-stroke: rgba(255, 87, 51, 0.12);
+  --connection-core: #5e281c;
 }
 
 /* Reset and Monospace Font */
@@ -30,6 +135,7 @@ html, body, #root {
   margin: 0;
   padding: 0;
   user-select: none;
+  transition: background-color 0.5s ease, color 0.5s ease;
 }
 
 /* CRT Screen Curvature Glass Simulation */
@@ -38,7 +144,10 @@ html, body, #root {
   width: 100%;
   height: 100%;
   overflow: hidden;
+  background-color: var(--bg-color);
+  color: var(--glow-color);
   box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.95);
+  transition: background-color 0.5s ease, color 0.5s ease;
 }
 
 /* Curvature reflection overlay */
@@ -78,8 +187,8 @@ html, body, #root {
   left: -50%;
   background-size: 50px 50px;
   background-image: 
-    linear-gradient(to right, rgba(51, 255, 102, 0.015) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(51, 255, 102, 0.015) 1px, transparent 1px);
+    linear-gradient(to right, rgba(var(--glow-color-rgb), 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(var(--glow-color-rgb), 0.02) 1px, transparent 1px);
   pointer-events: none;
   animation: grid-slide 100s linear infinite;
   transform-origin: center;
@@ -94,8 +203,8 @@ html, body, #root {
   height: 100%;
   background: linear-gradient(
     55deg, 
-    rgba(51, 255, 102, 0.03) 0%, 
-    rgba(51, 255, 102, 0.005) 25%, 
+    rgba(var(--glow-color-rgb), 0.04) 0%, 
+    rgba(var(--glow-color-rgb), 0.005) 25%, 
     transparent 50%
   );
   transform-origin: 50% 50%;
@@ -108,18 +217,20 @@ html, body, #root {
 .radar-panel {
   background: var(--panel-bg);
   border: 1px solid var(--border-color);
-  box-shadow: 0 0 25px rgba(27, 61, 36, 0.5), inset 0 0 15px rgba(51, 255, 102, 0.04);
+  box-shadow: 0 0 25px rgba(var(--border-color-rgb), 0.5), inset 0 0 15px rgba(var(--glow-color-rgb), 0.04);
   backdrop-filter: blur(8px);
   border-radius: 4px;
+  transition: border-color 0.5s ease, box-shadow 0.5s ease;
 }
 
 /* Glowing text utility */
 .glow-text {
-  text-shadow: 0 0 10px rgba(51, 255, 102, 0.95);
+  text-shadow: 0 0 10px rgba(var(--glow-color-rgb), 0.95);
+  transition: text-shadow 0.5s ease;
 }
 
 .glow-border {
-  box-shadow: 0 0 15px rgba(51, 255, 102, 0.55);
+  box-shadow: 0 0 15px rgba(var(--glow-color-rgb), 0.55);
 }
 
 /* Animated radar blips */
@@ -206,7 +317,7 @@ html, body, #root {
 /* Button & interactive hover styles */
 .btn-radar {
   border: 1px solid var(--border-color);
-  background: rgba(27, 61, 36, 0.12);
+  background: rgba(var(--border-color-rgb), 0.12);
   color: var(--glow-color);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
@@ -219,8 +330,8 @@ html, body, #root {
   text-transform: uppercase;
 }
 .btn-radar:hover:not(:disabled) {
-  background: rgba(51, 255, 102, 0.2);
-  box-shadow: 0 0 15px rgba(51, 255, 102, 0.7);
+  background: rgba(var(--glow-color-rgb), 0.2);
+  box-shadow: 0 0 15px rgba(var(--glow-color-rgb), 0.7);
   text-shadow: 0 0 6px #fff;
   transform: translateY(-1px);
 }
@@ -520,7 +631,8 @@ html, body, #root {
 }
 
 .glow-logo {
-  box-shadow: 0 0 15px rgba(51, 255, 102, 0.2);
-  filter: drop-shadow(0 0 10px rgba(51, 255, 102, 0.35));
+  box-shadow: 0 0 15px rgba(var(--glow-color-rgb), 0.2);
+  filter: drop-shadow(0 0 10px rgba(var(--glow-color-rgb), 0.35));
+  transition: box-shadow 0.5s ease, filter 0.5s ease;
 }
 

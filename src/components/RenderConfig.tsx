@@ -96,7 +96,7 @@ export const RenderConfig: React.FC<RenderConfigProps> = ({
         <div>
           {/* Header */}
           <div className="flex flex-col items-center mb-6">
-            <img src="/logo.png" alt="TIMMY WORLD GAME LOGO" className="w-24 h-24 object-contain mb-4 glow-logo border border-p1 border-opacity-30 p-1 bg-black bg-opacity-60" />
+            <img src="/logo_modern.png" alt="TIMMY WORLD GAME LOGO" className="w-24 h-24 object-contain mb-4 glow-logo border border-p1 border-opacity-30 p-1 bg-black bg-opacity-60" />
             <div className="flex justify-between items-center w-full">
               <h1 className="text-2xl font-bold glow-text tracking-widest text-p1">
                 TIMMY_WORLD_GAME

@@ -70,6 +70,16 @@ export default function App() {
   const stateRef = useRef(gameState);
   stateRef.current = gameState;
 
+  // Sync body theme class name & dynamic favicon on era change
+  useEffect(() => {
+    document.body.className = `bg-black theme-${gameState.eraId}`;
+
+    const faviconLink = document.querySelector("link[rel*='icon']") as HTMLLinkElement;
+    if (faviconLink) {
+      faviconLink.href = `/favicon_${gameState.eraId}.png`;
+    }
+  }, [gameState.eraId]);
+
   const handlePlayOffline = () => {
     setIsOffline(true);
     initializeOfflineLobby();
@@ -385,6 +395,9 @@ export default function App() {
           phase: data.phase,
           logs: data.phase === 'preamble' ? addLog('Decrypting historical chronologies...') : stateRef.current.logs
         });
+        break;
+      case 'era_change':
+        updateGameState({ eraId: data.eraId });
         break;
       case 'posture_submit':
         handlePostureChosen(payload.senderId, data.posture);
@@ -1439,7 +1452,7 @@ export default function App() {
 
   // Render orchestrator depending on current phase
   return (
-    <div className="crt-container h-full w-full">
+    <div className={`crt-container h-full w-full theme-${gameState.eraId}`}>
       {gameState.phase === 'lobby' && !renderUrl && !isOffline && (
         <RenderConfig
           onHostGame={handleHostGame}
@@ -1457,7 +1470,12 @@ export default function App() {
           currentUserId={myPlayerId}
           isHost={gameState.players.find(p => p.id === myPlayerId)?.isHost === true}
           selectedEraId={gameState.eraId}
-          onSelectEra={(eraId) => updateGameState({ eraId })}
+          onSelectEra={(eraId) => {
+            updateGameState({ eraId });
+            if (!isOffline) {
+              broadcastAction('era_change', { eraId });
+            }
+          }}
           onAddBot={handleAddBot}
           onRemovePlayer={handleRemovePlayer}
           onStartGame={handleStartGame}
@@ -1492,6 +1510,7 @@ export default function App() {
 
       {(gameState.phase === 'game' || gameState.phase === 'gameover') && (
         <GameBoard
+          eraId={gameState.eraId}
           players={gameState.players}
           nodes={gameState.nodes}
           connections={gameState.connections}

@@ -45,5 +45,5 @@ Open `http://localhost:5173` in one or more browser tabs to play!
 ## 🛠️ Technology Stack
 - **Framework**: [Vite](https://vite.dev) + [React](https://react.dev) + [TypeScript](https://www.typescriptlang.org)
 - **Styling**: Tailwind CSS + Custom CSS Variables (retro-phosphor CRT radar theme)
-- **Database/Realtime**: [Supabase Realtime Broadcast Channels](https://supabase.com/docs/guides/realtime)
+- **Database/Realtime**: [Render Realtime Broadcast Channels]
 - **Icons**: Lucide React

@@ -6,6 +6,7 @@ import { canReachNode } from '../utils/pathfinding';
 import { Shield, Target, Award, Eye, RefreshCw, Volume2, VolumeX, AlertTriangle, Compass, HelpCircle, Keyboard } from 'lucide-react';
 
 interface GameBoardProps {
+  eraId?: string;
   players: Player[];
   nodes: CountryNode[];
   connections: BorderConnection[];
@@ -26,6 +27,7 @@ interface GameBoardProps {
 }
 
 export const GameBoard: React.FC<GameBoardProps> = ({
+  eraId = 'modern',
   players,
   nodes,
   connections,
@@ -293,6 +295,11 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       {/* 1. Header/Scoreboard */}
       <div className="h-16 border-b border-p1 bg-black bg-opacity-80 px-6 flex justify-between items-center z-10">
         <div className="flex items-center gap-3">
+          <img 
+            src={`/logo_${eraId}.png`} 
+            alt="Era Logo" 
+            className="w-9 h-9 object-contain glow-logo border border-p1 border-opacity-30 p-0.5 bg-black bg-opacity-60" 
+          />
           <span className="font-bold glow-text tracking-widest text-lg header-title">TIMMY_WORLD_GAME</span>
           <div className="loader-bar w-24 header-title"></div>
         </div>
@@ -598,10 +605,10 @@ export const GameBoard: React.FC<GameBoardProps> = ({
               {/* Lat & Long Ocean Grid */}
               <g opacity="0.12">
                 {[120, 240, 360, 480, 600].map(y => (
-                  <line key={`lat-${y}`} x1="0" y1={y} x2="1000" y2={y} stroke="#33ff66" strokeWidth="0.5" strokeDasharray="4,8" />
+                  <line key={`lat-${y}`} x1="0" y1={y} x2="1000" y2={y} stroke="var(--glow-color)" strokeWidth="0.5" strokeDasharray="4,8" />
                 ))}
                 {[150, 300, 450, 600, 750, 900].map(x => (
-                  <line key={`lng-${x}`} x1={x} y1="0" x2={x} y2="700" stroke="#33ff66" strokeWidth="0.5" strokeDasharray="4,8" />
+                  <line key={`lng-${x}`} x1={x} y1="0" x2={x} y2="700" stroke="var(--glow-color)" strokeWidth="0.5" strokeDasharray="4,8" />
                 ))}
               </g>
 
@@ -610,9 +617,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({
               <path
                 key={index}
                 d={cont.d}
-                stroke="#1c4527"
+                stroke="var(--continent-stroke)"
                 strokeWidth="1.75"
-                fill="#05140b"
+                fill="var(--continent-fill)"
                 className="transition-all duration-500 opacity-90"
               />
             ))}
@@ -627,8 +634,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({
               const countryOwnerId = capitalNode ? capitalNode.ownerId : countryNodes[0]?.ownerId;
               const owner = countryOwnerId ? players.find(p => p.id === countryOwnerId) : null;
 
-              const fillColor = owner ? owner.color : 'rgba(51, 255, 102, 0.01)';
-              const strokeColor = owner ? owner.color : 'rgba(51, 255, 102, 0.12)';
+              const fillColor = owner ? owner.color : 'var(--country-unclaimed-fill)';
+              const strokeColor = owner ? owner.color : 'var(--country-unclaimed-stroke)';
               const strokeWidth = owner ? '2' : '1';
               const fillOpacity = owner ? 0.16 : 0.02;
 
@@ -663,7 +670,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                     y1={nodeFrom.y}
                     x2={nodeTo.x}
                     y2={nodeTo.y}
-                    stroke={isBarrier ? '#ffb700' : '#1b3d24'}
+                    stroke={isBarrier ? 'var(--p2-color)' : 'var(--border-color)'}
                     strokeWidth={isBarrier ? '3.5' : '1.5'}
                     strokeOpacity={isBarrier ? '0.4' : '0.6'}
                     className={isBarrier ? 'barrier-line' : ''}
@@ -674,7 +681,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                     y1={nodeFrom.y}
                     x2={nodeTo.x}
                     y2={nodeTo.y}
-                    stroke={isBarrier ? '#ff8000' : '#2d683d'}
+                    stroke={isBarrier ? 'var(--p2-color)' : 'var(--connection-core)'}
                     strokeWidth={isBarrier ? '1.5' : '0.75'}
                     strokeDasharray={isBarrier ? '4,4' : undefined}
                   />
@@ -908,7 +915,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                     <text
                       x="9"
                       y="-9"
-                      fill="#33ff66"
+                      fill="var(--glow-color)"
                       fontSize="9"
                       fontWeight="bold"
                     >

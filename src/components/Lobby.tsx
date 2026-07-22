@@ -151,9 +151,21 @@ export const Lobby: React.FC<LobbyProps> = ({
         {/* Right Side: Era Selector & Preamble Preview */}
         <div className="radar-panel p-6 border-p1 flex flex-col justify-between">
           <div>
-            <h2 className="text-xl font-bold glow-text tracking-widest mb-4 text-p1">
-              MISSION_OBJECTIVES
-            </h2>
+            <div className="flex items-center gap-4 mb-4">
+              <img 
+                src={`/logo_${selectedEraId}.png`} 
+                alt={`${selectedEra.name} LOGO`} 
+                className="w-16 h-16 object-contain glow-logo border border-p1 border-opacity-30 p-1 bg-black bg-opacity-60" 
+              />
+              <div>
+                <h2 className="text-xl font-bold glow-text tracking-widest text-p1">
+                  MISSION_OBJECTIVES
+                </h2>
+                <div className="text-[10px] text-p1 opacity-60 font-mono">
+                  ERA: {selectedEra.name.toUpperCase()}
+                </div>
+              </div>
+            </div>
             <div className="loader-bar mb-6"></div>
 
             <div className="mb-4">
