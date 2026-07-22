@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { Player, CountryNode, BorderConnection, TransitTroops, Alliance, GameLog, CombatResult } from '../types/game';
+import { getEmpireName } from '../utils/empireNameGenerator';
 import { COUNTRY_PATHS, DETAILED_CONTINENTS } from '../constants/countryPaths';
 import { playSound } from '../utils/audio';
 import { canReachNode } from '../utils/pathfinding';
@@ -289,60 +290,6 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     a => a.status === 'pending' && a.members.includes(currentUserId) && a.proposedBy !== currentUserId
   );
 
-  const eraTitles = (() => {
-    switch (eraId) {
-      case 'roman':
-        return {
-          gameTitle: 'CONQUEST_OF_ROME',
-          telemetry: 'CHRONICLES_OF_ROME',
-          coalitions: 'LEGION_ALLIANCES',
-          invitation: 'SENATE_ALLIANCE_PROPOSAL',
-          briefing: 'CENTURION_BRIEFING'
-        };
-      case 'napoleonic':
-        return {
-          gameTitle: 'GRAND_EMPIRE_WAR',
-          telemetry: 'MARSHAL_DISPATCH_FEED',
-          coalitions: 'DIPLOMATIC_COALITIONS',
-          invitation: 'ROYAL_COALITION_OFFER',
-          briefing: 'MARSHAL_BRIEFING'
-        };
-      case 'british_empire':
-        return {
-          gameTitle: 'PAX_BRITANNICA',
-          telemetry: 'TELEGRAPH_DESPATCHES',
-          coalitions: 'COLONIAL_LEAGUES',
-          invitation: 'IMPERIAL_TREATY_PROPOSAL',
-          briefing: 'GOVERNOR_BRIEFING'
-        };
-      case 'ww1':
-        return {
-          gameTitle: 'THE_GREAT_WAR',
-          telemetry: 'FIELD_TELEGRAPH_LOGS',
-          coalitions: 'ENTENTE_&_ALLIANCES',
-          invitation: 'FIELD_DISPATCH_TREATY',
-          briefing: 'STAFF_OFFICER_BRIEFING'
-        };
-      case 'ww2':
-        return {
-          gameTitle: 'WORLD_WAR_II_COMMAND',
-          telemetry: 'BUNKER_TELEMETRY_FEED',
-          coalitions: 'ALLIED_&_AXIS_BLOCS',
-          invitation: 'HIGH_COMMAND_PACT',
-          briefing: 'BUNKER_BRIEFING'
-        };
-      case 'modern':
-      default:
-        return {
-          gameTitle: 'CYBER_WAR_COMMAND',
-          telemetry: 'TELEMETRY_FEED',
-          coalitions: 'ACTIVE_COALITIONS',
-          invitation: 'ALLIANCE_INVITATION',
-          briefing: 'TACTICAL_BRIEFING'
-        };
-    }
-  })();
-
   return (
     <div className="h-screen w-screen bg-[#050806] flex flex-col overflow-hidden text-p1 relative select-none">
       
@@ -354,7 +301,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
             alt="Era Logo" 
             className="w-9 h-9 object-contain glow-logo border border-p1 border-opacity-30 p-0.5 bg-black bg-opacity-60" 
           />
-          <span className="font-bold glow-text tracking-widest text-lg header-title">{eraTitles.gameTitle}</span>
+          <span className="font-bold glow-text tracking-widest text-lg header-title">TIMMY_WORLD_GAME</span>
           <div className="loader-bar w-24 header-title"></div>
         </div>
 
@@ -364,6 +311,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
             const ownedNodes = nodes.filter(n => n.ownerId === p.id);
             const totalTroops = ownedNodes.reduce((sum, n) => sum + n.troops, 0);
             const allianceActive = alliances.some(a => a.status === 'active' && a.members.includes(p.id) && a.members.includes(currentUserId));
+            const empName = getEmpireName(p);
             
             return (
               <div 
@@ -373,11 +321,16 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                 }`}
                 style={{ borderColor: p.color } as React.CSSProperties}
               >
-                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: p.color }}></span>
-                <span className="font-bold uppercase tracking-wider" style={{ color: p.color }}>
-                  {p.name.slice(0, 10)} {p.id === currentUserId && '(YOU)'}
-                </span>
-                <span className="opacity-60 font-mono">
+                <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: p.color }}></span>
+                <div className="flex flex-col">
+                  <span className="font-bold uppercase tracking-wider text-[11px] max-w-[130px] truncate" style={{ color: p.color }}>
+                    {empName} {p.id === currentUserId && '(YOU)'}
+                  </span>
+                  <span className="text-[9px] text-p1 opacity-60 font-mono -mt-0.5">
+                    {p.name}
+                  </span>
+                </div>
+                <span className="opacity-60 font-mono text-[10px] ml-1">
                   ND:{ownedNodes.length} TR:{totalTroops}
                 </span>
                 {allianceActive && (
@@ -429,7 +382,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
           <button
             onClick={onLaunchTutorial}
             className="btn-radar p-2 rounded flex items-center justify-center border-p1 text-p1"
-            title={eraTitles.briefing}
+            title="LAUNCH TACTICAL BRIEFING"
           >
             <HelpCircle className="w-4 h-4" />
           </button>
@@ -469,14 +422,14 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                 {activeRequests.length > 0 && (
                   <div className="p-4 border-b border-p2 bg-red-950 bg-opacity-10 flex-shrink-0">
                     <h4 className="text-xs font-bold text-p2 uppercase tracking-widest mb-3 flex items-center gap-2">
-                      <AlertTriangle className="w-4 h-4" /> {eraTitles.invitation}
+                      <AlertTriangle className="w-4 h-4" /> ALLIANCE_INVITATION
                     </h4>
                     {activeRequests.map(req => {
                       const sender = players.find(p => p.id === req.proposedBy);
                       return (
                         <div key={req.id} className="p-3 bg-black border border-p2 space-y-3">
                           <span className="text-xs leading-relaxed text-p2">
-                            Commander <strong style={{ color: sender?.color }}>{sender?.name}</strong> proposes a formal military Coalition.
+                            Terminal <strong style={{ color: sender?.color }}>{getEmpireName(sender)} ({sender?.name})</strong> proposes a formal military Coalition.
                           </span>
                           <div className="flex gap-2">
                             <button
@@ -500,7 +453,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
                 {/* Active Alliances Panel */}
                 <div className="p-4 border-b border-p1 flex flex-col">
-                  <h3 className="text-xs uppercase text-p1 opacity-60 mb-2 tracking-wider">{eraTitles.coalitions}</h3>
+                  <h3 className="text-xs uppercase text-p1 opacity-60 mb-2 tracking-wider">ACTIVE_COALITIONS</h3>
                   <div className="space-y-2">
                     {alliances.filter(a => a.status === 'active' || a.status === 'truce').map(alliance => {
                       const membersList = alliance.members.map(mId => players.find(p => p.id === mId));
@@ -525,7 +478,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                             <div className="flex flex-wrap gap-2 pt-1">
                               {membersList.map(member => (
                                 <span key={member?.id} className="text-[10px] px-1 border border-opacity-40" style={{ color: member?.color, borderColor: member?.color }}>
-                                  {member?.name}
+                                  {getEmpireName(member)} ({member?.name})
                                 </span>
                               ))}
                             </div>
@@ -551,8 +504,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
               {/* Game Logs (Real-time telemetry feeds) */}
               <div className="h-64 p-4 border-t border-p1 flex flex-col justify-between flex-shrink-0">
-                <h3 className="text-xs uppercase text-p1 opacity-60 mb-2 tracking-wider">{eraTitles.telemetry}</h3>
-                <div className="flex-1 overflow-y-auto custom-scrollbar space-y-1 text-[10px] leading-relaxed pr-2">
+                <h3 className="text-xs uppercase text-p1 opacity-60 mb-2 tracking-wider">TELEMETRY_FEED</h3>
+                <div className="flex-1 overflow-y-auto custom-scrollbar space-y-1 font-mono text-[10px] leading-relaxed pr-2">
                   {logs.map((log) => (
                     <div key={log.id} className="border-b border-p1 border-opacity-10 pb-1">
                       <span className="opacity-40">[{log.timestamp}]</span> {log.message}
@@ -567,9 +520,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
         {/* 3. Central Map Grid */}
         <div className="flex-1 relative flex items-center justify-center overflow-hidden">
-          {/* Era background grid & ambient animations */}
-          <div className="era-bg-grid"></div>
-          <div className="era-bg-animation"></div>
+          {/* Radar background grid */}
+          <div className="radar-grid"></div>
+          <div className="radar-sweep"></div>
 
           {/* On-Screen Combat Toast (Top Right Side, Compact) */}
           {lastCombatResult && (
@@ -995,11 +948,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                       fontWeight="bold"
                       textAnchor="middle"
                     >
-                      {node.type === 'capital' 
-                        ? (eraId === 'roman' ? '🏛 CAP' : eraId === 'napoleonic' ? '♔ CAP' : eraId === 'british_empire' ? '⚙ CAP' : '★ CAP') 
-                        : node.type === 'military_base' 
-                        ? (eraId === 'roman' ? '🛡 FORT' : eraId === 'ww1' ? '⛺ BASE' : '⚔ BASE') 
-                        : '🏙 CIT'}
+                      {node.type === 'capital' ? '★ CAP' : node.type === 'military_base' ? '⚔ BASE' : '🏙 CIT'}
                     </text>
                   </g>
 
@@ -1095,7 +1044,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                 <div className="text-[11px] pt-1 flex justify-between gap-4">
                   <span className="opacity-60">Sovereign:</span>
                   <span className="font-bold" style={{ color: hOwner?.color || 'var(--neutral-color)' }}>
-                    {hOwner?.name || 'NEUTRAL'}
+                    {getEmpireName(hOwner, hNode.countryName)} {hOwner ? `(${hOwner.name})` : ''}
                   </span>
                 </div>
                 <div className="text-[11px] flex justify-between gap-4">
@@ -1147,9 +1096,14 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                       </div>
 
                       <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-                        <div className="text-p1 opacity-60">OWNER:</div>
-                        <div className="font-semibold truncate" style={{ color: players.find(p => p.id === selectedNode.ownerId)?.color || 'var(--neutral-color)' }}>
-                          {players.find(p => p.id === selectedNode.ownerId)?.name || 'NEUTRAL'}
+                        <div className="text-p1 opacity-60">SOVEREIGN:</div>
+                        <div className="font-semibold truncate flex flex-col" style={{ color: players.find(p => p.id === selectedNode.ownerId)?.color || 'var(--neutral-color)' }}>
+                          <span>{getEmpireName(players.find(p => p.id === selectedNode.ownerId), selectedNode.countryName).toUpperCase()}</span>
+                          {selectedNode.ownerId && (
+                            <span className="text-[9px] opacity-60 font-normal">
+                              ({players.find(p => p.id === selectedNode.ownerId)?.name})
+                            </span>
+                          )}
                         </div>
                         
                         <div className="text-p1 opacity-60">INFRA_TYPE:</div>
@@ -1291,9 +1245,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
             <div className="text-lg font-bold mb-6 text-white uppercase tracking-wider">
               {Array.isArray(winnerId) ? (
-                <span>Coalition Victory: {winnerId.map(id => players.find(p => p.id === id)?.name).join(' & ')}</span>
+                <span>Coalition Victory: {winnerId.map(id => getEmpireName(players.find(p => p.id === id))).join(' & ')}</span>
               ) : (
-                <span>Dominant Empire: {players.find(p => p.id === winnerId)?.name}</span>
+                <span>Dominant Empire: {getEmpireName(players.find(p => p.id === winnerId))} ({players.find(p => p.id === winnerId)?.name})</span>
               )}
             </div>
 

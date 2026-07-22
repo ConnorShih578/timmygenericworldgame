@@ -1,12 +1,15 @@
 import React from 'react';
+import { Dices } from 'lucide-react';
 import type { Player, CountryNode, Era } from '../types/game';
 import { playSound } from '../utils/audio';
+import { generateRandomEmpireName, getEmpireName } from '../utils/empireNameGenerator';
 
 interface CountrySelectionProps {
   era: Era;
   players: Player[];
   currentUserId: string;
   onSelectCountry: (countryId: string) => void;
+  onUpdateEmpireName?: (playerId: string, empireName: string) => void;
 }
 
 export const CountrySelection: React.FC<CountrySelectionProps> = ({
@@ -14,10 +17,12 @@ export const CountrySelection: React.FC<CountrySelectionProps> = ({
   players,
   currentUserId,
   onSelectCountry,
+  onUpdateEmpireName,
 }) => {
   const me = players.find((p) => p.id === currentUserId);
   const myStars = me?.starsAssigned || 1;
   const myPick = me?.selectedCountryId || null;
+  const myEmpireName = me?.empireName || '';
 
   // Group nodes by countryId to identify unique countries, their names, stars, and node names
   const countries = era.nodes.reduce((acc: { [key: string]: { id: string; name: string; stars: number; nodes: CountryNode[] } }, node: CountryNode) => {
@@ -46,10 +51,23 @@ export const CountrySelection: React.FC<CountrySelectionProps> = ({
     return acc;
   }, {} as { [countryId: string]: Player });
 
-  const handlePick = (countryId: string) => {
-    if (pickedCountries[countryId] || myPick) return;
+  const handlePick = (country: { id: string; name: string }) => {
+    if (pickedCountries[country.id] || myPick) return;
     playSound.ping();
-    onSelectCountry(countryId);
+
+    // If empire name is empty or not custom set yet, default to the chosen country's historical name
+    if (!myEmpireName.trim() && onUpdateEmpireName) {
+      onUpdateEmpireName(currentUserId, country.name);
+    }
+
+    onSelectCountry(country.id);
+  };
+
+  const handleRandomizeEmpireName = () => {
+    playSound.click();
+    if (onUpdateEmpireName) {
+      onUpdateEmpireName(currentUserId, generateRandomEmpireName());
+    }
   };
 
   return (
@@ -60,12 +78,46 @@ export const CountrySelection: React.FC<CountrySelectionProps> = ({
         </h2>
         <div className="loader-bar mb-6"></div>
 
+        {/* Custom Empire Name Selection Section */}
+        <div className="p-4 bg-black bg-opacity-50 border border-p1 mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div>
+              <label className="text-xs uppercase text-p1 font-bold tracking-wider block mb-0.5">
+                Designate Sovereign Empire Title
+              </label>
+              <span className="text-[10px] text-p1 opacity-70 font-mono">
+                Customize your empire name or select a territory to inherit its historical identity.
+              </span>
+            </div>
+            <div className="flex gap-2 w-full sm:w-auto">
+              <input
+                type="text"
+                value={myEmpireName}
+                onChange={(e) => onUpdateEmpireName && onUpdateEmpireName(currentUserId, e.target.value)}
+                placeholder="e.g. Imperial Legion"
+                maxLength={24}
+                className="bg-black border border-p1 text-p1 px-3 py-1 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-p1 flex-1 sm:w-56"
+                style={{ borderColor: me?.color }}
+              />
+              <button
+                type="button"
+                onClick={handleRandomizeEmpireName}
+                className="btn-radar px-3 py-1 text-xs uppercase flex items-center gap-1.5 border-p1 text-p1 hover:bg-p1 hover:bg-opacity-20"
+                title="Randomize Empire Name"
+              >
+                <Dices className="w-3.5 h-3.5 text-p1" />
+                <span className="hidden sm:inline">RANDOM</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
         <div className="flex flex-col md:flex-row gap-6 mb-8">
           {/* Left panel: Info about player bracket */}
           <div className="flex-1 p-4 bg-black bg-opacity-40 border border-p1">
             <h3 className="text-sm font-bold text-p1 uppercase tracking-wider mb-2">Draft Assignment</h3>
             <p className="text-xs text-p1 opacity-80 leading-relaxed mb-4">
-              Your placement in the Posture Handshake has assigned you to the following bracket:
+              Your placement in Rock Paper Scissors has assigned you to the following bracket:
             </p>
             <div className="text-2xl font-bold glow-text mb-4 text-p1 uppercase tracking-widest">
               {myStars}-Star Class ({'★'.repeat(myStars)})
@@ -84,11 +136,12 @@ export const CountrySelection: React.FC<CountrySelectionProps> = ({
             <div className="space-y-2">
               {players.map((p) => {
                 const picked = countryList.find((c) => c.id === p.selectedCountryId);
+                const empireDisplay = getEmpireName(p, picked?.name);
                 return (
                   <div key={p.id} className="flex justify-between items-center text-xs">
                     <span style={{ color: p.color }}>{p.name} ({p.starsAssigned}★)</span>
-                    <span className="font-mono" style={{ color: p.color }}>
-                      {picked ? `[${picked.name.toUpperCase()}]` : 'SELECTING...'}
+                    <span className="font-mono truncate max-w-[180px] text-right" style={{ color: p.color }}>
+                      {picked ? `[${empireDisplay.toUpperCase()}]` : 'SELECTING...'}
                     </span>
                   </div>
                 );
@@ -112,7 +165,7 @@ export const CountrySelection: React.FC<CountrySelectionProps> = ({
               <button
                 key={country.id}
                 disabled={isPicked || !!myPick}
-                onClick={() => handlePick(country.id)}
+                onClick={() => handlePick(country)}
                 className={`p-4 border text-left flex flex-col justify-between transition-all h-[140px] relative ${
                   isMe
                     ? 'border-p1 bg-p1 bg-opacity-25'
@@ -149,10 +202,10 @@ export const CountrySelection: React.FC<CountrySelectionProps> = ({
 
                 {isPicked && (
                   <div 
-                    className="absolute inset-0 bg-black bg-opacity-80 flex items-center justify-center font-bold text-sm tracking-widest uppercase border border-p1"
+                    className="absolute inset-0 bg-black bg-opacity-80 flex items-center justify-center font-bold text-sm tracking-widest uppercase border border-p1 p-2 text-center"
                     style={{ color: picker.color, borderColor: picker.color }}
                   >
-                    Drafted By {picker.name}
+                    Drafted By {getEmpireName(picker, country.name)} ({picker.name})
                   </div>
                 )}
               </button>

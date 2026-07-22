@@ -1,16 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@600;700;900&family=Cormorant+Garamond:wght@600;700&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Orbitron:wght@400;700;900&family=Playfair+Display:wght@600;700&family=Share+Tech+Mono&family=Special+Elite&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700&display=swap');
 
 :root {
   /* Default Theme (Modern Era - Tactical Cyan) */
-  --main-font: 'Orbitron', 'Share Tech Mono', sans-serif;
-  --header-font: 'Orbitron', sans-serif;
   --bg-color: #020708;
-  --panel-bg: rgba(1, 8, 14, 0.95);
-  --border-color: #00e5ff;
-  --border-color-rgb: 0, 229, 255;
+  --panel-bg: rgba(1, 4, 6, 0.99);
+  --border-color: #0a2f35;
+  --border-color-rgb: 10, 47, 53;
   --glow-color: #00e5ff;
   --glow-color-rgb: 0, 229, 255;
-  --neutral-color: #285560;
+  --neutral-color: #384d50;
   
   --continent-fill: #010f13;
   --continent-stroke: #092c33;
@@ -24,128 +22,108 @@
   --p4-color: #e040fb; /* Recon Violet */
 }
 
-/* ==========================================================================
-   ERA THEMES SETUP
-   ========================================================================== */
-
-/* 1. Modern Era (Cyber War Command HUD) */
+/* Modern Era (Tactical Cyan HUD) */
 .theme-modern {
-  --main-font: 'Orbitron', 'Share Tech Mono', sans-serif;
-  --header-font: 'Orbitron', sans-serif;
   --bg-color: #020708;
-  --panel-bg: rgba(1, 8, 14, 0.95);
-  --border-color: #00e5ff;
-  --border-color-rgb: 0, 229, 255;
+  --panel-bg: rgba(1, 4, 6, 0.99);
+  --border-color: #0a2f35;
+  --border-color-rgb: 10, 47, 53;
   --glow-color: #00e5ff;
   --glow-color-rgb: 0, 229, 255;
-  --neutral-color: #285560;
+  --neutral-color: #384d50;
   --continent-fill: #010f13;
   --continent-stroke: #092c33;
-  --country-unclaimed-fill: rgba(0, 229, 255, 0.02);
-  --country-unclaimed-stroke: rgba(0, 229, 255, 0.15);
+  --country-unclaimed-fill: rgba(0, 229, 255, 0.015);
+  --country-unclaimed-stroke: rgba(0, 229, 255, 0.12);
   --connection-core: #0d5460;
 }
 
-/* 2. World War II (Classic Green Phosphor Oscilloscope Radar) */
+/* World War II (Classic Green Phosphor Radar) */
 .theme-ww2 {
-  --main-font: 'Share Tech Mono', monospace;
-  --header-font: 'Share Tech Mono', monospace;
-  --bg-color: #030804;
-  --panel-bg: rgba(3, 12, 5, 0.95);
-  --border-color: #33ff66;
-  --border-color-rgb: 51, 255, 102;
+  --bg-color: #040705;
+  --panel-bg: rgba(3, 6, 4, 0.99);
+  --border-color: #1a3821;
+  --border-color-rgb: 26, 56, 33;
   --glow-color: #33ff66;
   --glow-color-rgb: 51, 255, 102;
-  --neutral-color: #27472d;
+  --neutral-color: #3e4e43;
   --continent-fill: #05140b;
   --continent-stroke: #1c4527;
-  --country-unclaimed-fill: rgba(51, 255, 102, 0.02);
-  --country-unclaimed-stroke: rgba(51, 255, 102, 0.15);
+  --country-unclaimed-fill: rgba(51, 255, 102, 0.015);
+  --country-unclaimed-stroke: rgba(51, 255, 102, 0.12);
   --connection-core: #2d683d;
 }
 
-/* 3. World War I (1914 Vintage Telegraph & Field Dispatch Parchment) */
+/* World War I (Distress Amber / Vintage Sepia Console) */
 .theme-ww1 {
-  --main-font: 'Special Elite', 'Courier Prime', typewriter, serif;
-  --header-font: 'Special Elite', serif;
-  --bg-color: #120c06;
-  --panel-bg: rgba(32, 22, 14, 0.96);
-  --border-color: #d4a359;
-  --border-color-rgb: 212, 163, 89;
+  --bg-color: #080502;
+  --panel-bg: rgba(6, 4, 2, 0.99);
+  --border-color: #38240a;
+  --border-color-rgb: 56, 36, 10;
   --glow-color: #ffb700;
   --glow-color-rgb: 255, 183, 0;
-  --neutral-color: #574128;
-  --continent-fill: #1f140a;
-  --continent-stroke: #3d2914;
-  --country-unclaimed-fill: rgba(255, 183, 0, 0.03);
-  --country-unclaimed-stroke: rgba(212, 163, 89, 0.25);
-  --connection-core: #61421f;
+  --neutral-color: #4e4033;
+  --continent-fill: #140d05;
+  --continent-stroke: #332109;
+  --country-unclaimed-fill: rgba(255, 183, 0, 0.015);
+  --country-unclaimed-stroke: rgba(255, 183, 0, 0.12);
+  --connection-core: #5c3c13;
 }
 
-/* 4. Pax Britannica (1890 Industrial Steampunk & Riveted Copper) */
+/* Pax Britannica (Warm Copper / Industrial Victorian Terminal) */
 .theme-british_empire {
-  --main-font: 'Playfair Display', 'Cinzel', serif;
-  --header-font: 'Cinzel Decorative', 'Playfair Display', serif;
-  --bg-color: #120a06;
-  --panel-bg: rgba(28, 16, 10, 0.96);
-  --border-color: #e59866;
-  --border-color-rgb: 229, 152, 102;
+  --bg-color: #060504;
+  --panel-bg: rgba(4, 3, 2, 0.99);
+  --border-color: #2f2015;
+  --border-color-rgb: 47, 32, 21;
   --glow-color: #e59866;
   --glow-color-rgb: 229, 152, 102;
-  --neutral-color: #593c28;
-  --continent-fill: #1f110a;
-  --continent-stroke: #422414;
-  --country-unclaimed-fill: rgba(229, 152, 102, 0.03);
-  --country-unclaimed-stroke: rgba(229, 152, 102, 0.25);
-  --connection-core: #5e371f;
+  --neutral-color: #4c3f35;
+  --continent-fill: #120e0a;
+  --continent-stroke: #2e1d10;
+  --country-unclaimed-fill: rgba(229, 152, 102, 0.015);
+  --country-unclaimed-stroke: rgba(229, 152, 102, 0.12);
+  --connection-core: #4a311d;
 }
 
-/* 5. Napoleonic Era (1812 Royal Navy Blue Canvas & Gold Leaf Filigree) */
+/* Napoleonic Era (Royal Brass / Imperial Gold Console) */
 .theme-napoleonic {
-  --main-font: 'Cormorant Garamond', 'Cinzel', serif;
-  --header-font: 'Cinzel', serif;
-  --bg-color: #08101d;
-  --panel-bg: rgba(12, 22, 40, 0.97);
-  --border-color: #ffd700;
-  --border-color-rgb: 255, 215, 0;
+  --bg-color: #060502;
+  --panel-bg: rgba(4, 3, 1, 0.99);
+  --border-color: #33270d;
+  --border-color-rgb: 51, 39, 13;
   --glow-color: #ffd700;
   --glow-color-rgb: 255, 215, 0;
-  --neutral-color: #4d4624;
-  --continent-fill: #0e1b30;
-  --continent-stroke: #1a3257;
-  --country-unclaimed-fill: rgba(255, 215, 0, 0.03);
-  --country-unclaimed-stroke: rgba(255, 215, 0, 0.25);
-  --connection-core: #6e5c12;
+  --neutral-color: #484133;
+  --continent-fill: #141108;
+  --continent-stroke: #2d230b;
+  --country-unclaimed-fill: rgba(255, 215, 0, 0.015);
+  --country-unclaimed-stroke: rgba(255, 215, 0, 0.12);
+  --connection-core: #4f3b14;
 }
 
-/* 6. Roman Times (117 AD Trajan Carved Stone & Terracotta Shield) */
+/* Roman Times (Terracotta Red / Ancient Legionary Shield) */
 .theme-roman {
-  --main-font: 'Cinzel', serif;
-  --header-font: 'Cinzel', serif;
-  --bg-color: #140806;
-  --panel-bg: rgba(28, 12, 9, 0.97);
-  --border-color: #ff5733;
-  --border-color-rgb: 255, 87, 51;
+  --bg-color: #070302;
+  --panel-bg: rgba(5, 2, 1, 0.99);
+  --border-color: #3d1c15;
+  --border-color-rgb: 61, 28, 21;
   --glow-color: #ff5733;
   --glow-color-rgb: 255, 87, 51;
-  --neutral-color: #5e3128;
-  --continent-fill: #210c08;
-  --continent-stroke: #421810;
-  --country-unclaimed-fill: rgba(255, 87, 51, 0.03);
-  --country-unclaimed-stroke: rgba(255, 87, 51, 0.25);
-  --connection-core: #6b2618;
+  --neutral-color: #503733;
+  --continent-fill: #160c0a;
+  --continent-stroke: #381912;
+  --country-unclaimed-fill: rgba(255, 87, 51, 0.015);
+  --country-unclaimed-stroke: rgba(255, 87, 51, 0.12);
+  --connection-core: #5e281c;
 }
 
-/* Apply Era Font Globally */
+/* Reset and Monospace Font */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: var(--main-font);
-}
-
-h1, h2, h3, .header-title, .title-font {
-  font-family: var(--header-font) !important;
+  font-family: 'Share Tech Mono', 'Courier New', Courier, monospace;
 }
 
 html, body, #root {
@@ -160,7 +138,7 @@ html, body, #root {
   transition: background-color 0.5s ease, color 0.5s ease;
 }
 
-/* Base App Shell Container */
+/* CRT Screen Curvature Glass Simulation */
 .crt-container {
   position: relative;
   width: 100%;
@@ -168,17 +146,12 @@ html, body, #root {
   overflow: hidden;
   background-color: var(--bg-color);
   color: var(--glow-color);
+  box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.95);
   transition: background-color 0.5s ease, color 0.5s ease;
 }
 
-/* CRT Screen Scanlines & Curvature Reflection ONLY for Modern and WWII */
-.theme-modern.crt-container,
-.theme-ww2.crt-container {
-  box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.95);
-}
-
-.theme-modern.crt-container::before,
-.theme-ww2.crt-container::before {
+/* Curvature reflection overlay */
+.crt-container::before {
   content: " ";
   display: block;
   position: absolute;
@@ -192,8 +165,8 @@ html, body, #root {
   pointer-events: none;
 }
 
-.theme-modern.crt-container::after,
-.theme-ww2.crt-container::after {
+/* Screen flicker and scanline glow */
+.crt-container::after {
   content: " ";
   display: block;
   position: absolute;
@@ -205,105 +178,29 @@ html, body, #root {
   animation: flicker 0.2s infinite;
 }
 
-/* Decorative Framing Overlays for Historical Eras */
-.theme-ww1.crt-container {
-  border: 8px solid #2a1b0e;
-  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.85);
-}
-
-.theme-british_empire.crt-container {
-  border: 10px solid #2b180d;
-  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.9);
-}
-
-.theme-napoleonic.crt-container {
-  border: 8px solid #0f1c33;
-  box-shadow: inset 0 0 70px rgba(0, 0, 0, 0.95);
-}
-
-.theme-roman.crt-container {
-  border: 10px solid #26110a;
-  box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.95);
-}
-
-/* ==========================================================================
-   AMBIENT BACKGROUND OVERLAYS BY ERA
-   ========================================================================== */
-
-.era-bg-grid {
+/* Scrolling radar background grid */
+.radar-grid {
   position: absolute;
   width: 200%;
   height: 200%;
   top: -50%;
   left: -50%;
+  background-size: 50px 50px;
+  background-image: 
+    linear-gradient(to right, rgba(var(--glow-color-rgb), 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(var(--glow-color-rgb), 0.02) 1px, transparent 1px);
   pointer-events: none;
+  animation: grid-slide 100s linear infinite;
   transform-origin: center;
 }
 
-/* Modern Cyber Grid */
-.theme-modern .era-bg-grid {
-  background-size: 50px 50px;
-  background-image: 
-    linear-gradient(to right, rgba(0, 229, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
-  animation: grid-slide 100s linear infinite;
-}
-
-/* WWII Oscilloscope Grid */
-.theme-ww2 .era-bg-grid {
-  background-size: 40px 40px;
-  background-image: 
-    linear-gradient(to right, rgba(51, 255, 102, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(51, 255, 102, 0.04) 1px, transparent 1px);
-  animation: grid-slide 120s linear infinite;
-}
-
-/* WWI Sepia Paper Grain & Cross-Hatch Grid */
-.theme-ww1 .era-bg-grid {
-  background-size: 60px 60px;
-  background-image: 
-    radial-gradient(rgba(212, 163, 89, 0.06) 1px, transparent 1px),
-    linear-gradient(to right, rgba(212, 163, 89, 0.02) 1px, transparent 1px);
-  opacity: 0.8;
-}
-
-/* Pax Britannica Copper Mesh Grid */
-.theme-british_empire .era-bg-grid {
-  background-size: 80px 80px;
-  background-image: 
-    linear-gradient(45deg, rgba(229, 152, 102, 0.025) 25%, transparent 25%), 
-    linear-gradient(-45deg, rgba(229, 152, 102, 0.025) 25%, transparent 25%);
-}
-
-/* Napoleonic Royal Canvas Filigree Grid */
-.theme-napoleonic .era-bg-grid {
-  background-size: 70px 70px;
-  background-image: 
-    radial-gradient(circle at 50% 50%, rgba(255, 215, 0, 0.03) 2px, transparent 2px),
-    linear-gradient(to right, rgba(255, 215, 0, 0.015) 1px, transparent 1px);
-}
-
-/* Roman Stone Masonry Grid */
-.theme-roman .era-bg-grid {
-  background-size: 90px 90px;
-  background-image: 
-    linear-gradient(to right, rgba(255, 87, 51, 0.02) 2px, transparent 2px),
-    linear-gradient(to bottom, rgba(255, 87, 51, 0.02) 2px, transparent 2px);
-}
-
-/* Era Background Ambient Animation Sweep / Ornaments */
-.era-bg-animation {
+/* Radar scanline sweep */
+.radar-sweep {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.theme-modern .era-bg-animation,
-.theme-ww2 .era-bg-animation {
   background: linear-gradient(
     55deg, 
     rgba(var(--glow-color-rgb), 0.04) 0%, 
@@ -312,88 +209,33 @@ html, body, #root {
   );
   transform-origin: 50% 50%;
   animation: radar-rotate 10s linear infinite;
+  pointer-events: none;
+  z-index: 1;
 }
 
-/* WWI Compass Rose Rotating Accent */
-.theme-ww1 .era-bg-animation {
-  background: radial-gradient(circle at 50% 50%, rgba(255, 183, 0, 0.03) 0%, transparent 70%);
-  animation: compass-pulse 6s ease-in-out infinite;
-}
-
-/* Pax Britannica Steam-Gear Ambient Light */
-.theme-british_empire .era-bg-animation {
-  background: radial-gradient(circle at 50% 50%, rgba(229, 152, 102, 0.04) 0%, transparent 65%);
-  animation: gear-glow 8s ease-in-out infinite;
-}
-
-/* Napoleonic Gold Leaf Shimmer */
-.theme-napoleonic .era-bg-animation {
-  background: radial-gradient(circle at 50% 40%, rgba(255, 215, 0, 0.04) 0%, transparent 75%);
-  animation: gold-shimmer 7s ease-in-out infinite;
-}
-
-/* Roman Torchlight Flicker */
-.theme-roman .era-bg-animation {
-  background: radial-gradient(circle at 50% 50%, rgba(255, 87, 51, 0.04) 0%, transparent 60%);
-  animation: torch-flicker 3s ease-in-out infinite;
-}
-
-/* ==========================================================================
-   PANEL AND BUTTON STYLING BY ERA
-   ========================================================================== */
-
-/* Universal Radar / Era Panel Container */
+/* Terminal and Holographic Panels */
 .radar-panel {
   background: var(--panel-bg);
   border: 1px solid var(--border-color);
+  box-shadow: 0 0 25px rgba(var(--border-color-rgb), 0.5), inset 0 0 15px rgba(var(--glow-color-rgb), 0.04);
   backdrop-filter: blur(8px);
-  transition: all 0.4s ease;
-}
-
-.theme-modern .radar-panel {
   border-radius: 4px;
-  border: 1px solid #00e5ff;
-  box-shadow: 0 0 20px rgba(0, 229, 255, 0.25), inset 0 0 15px rgba(0, 229, 255, 0.03);
-}
-
-.theme-ww2 .radar-panel {
-  border-radius: 2px;
-  border: 2px solid #33ff66;
-  box-shadow: 0 0 20px rgba(51, 255, 102, 0.25), inset 0 0 15px rgba(51, 255, 102, 0.03);
-}
-
-.theme-ww1 .radar-panel {
-  border-radius: 0px;
-  border: 2px solid #d4a359;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.85), inset 0 0 25px rgba(212, 163, 89, 0.06);
-}
-
-.theme-british_empire .radar-panel {
-  border-radius: 6px;
-  border: 2px solid #e59866;
-  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(229, 152, 102, 0.08);
-}
-
-.theme-napoleonic .radar-panel {
-  border-radius: 4px;
-  border: 2px solid #ffd700;
-  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.95), inset 0 0 25px rgba(255, 215, 0, 0.08);
-}
-
-.theme-roman .radar-panel {
-  border-radius: 2px;
-  border: 2px solid #ff5733;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.95), inset 0 0 25px rgba(255, 87, 51, 0.08);
+  transition: border-color 0.5s ease, box-shadow 0.5s ease;
 }
 
 /* Glowing text utility */
 .glow-text {
-  text-shadow: 0 0 12px rgba(var(--glow-color-rgb), 0.85);
+  text-shadow: 0 0 10px rgba(var(--glow-color-rgb), 0.95);
   transition: text-shadow 0.5s ease;
 }
 
 .glow-border {
-  box-shadow: 0 0 15px rgba(var(--glow-color-rgb), 0.45);
+  box-shadow: 0 0 15px rgba(var(--glow-color-rgb), 0.55);
+}
+
+/* Animated radar blips */
+.radar-blip {
+  animation: blip-pulse 2.2s infinite ease-out;
 }
 
 /* Capital Seat of Power pulse circle */
@@ -418,27 +260,6 @@ html, body, #root {
 @keyframes radar-rotate {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
-}
-
-@keyframes compass-pulse {
-  0%, 100% { transform: scale(1); opacity: 0.6; }
-  50% { transform: scale(1.05); opacity: 0.9; }
-}
-
-@keyframes gear-glow {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 0.85; }
-}
-
-@keyframes gold-shimmer {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 0.95; }
-}
-
-@keyframes torch-flicker {
-  0%, 100% { opacity: 0.7; transform: scale(1); }
-  33% { opacity: 0.9; transform: scale(1.03); }
-  66% { opacity: 0.75; transform: scale(0.98); }
 }
 
 @keyframes grid-slide {
@@ -478,7 +299,7 @@ html, body, #root {
   }
 }
 
-/* Custom Scrollbars */
+/* Scrollbar styling for CRT green list logs */
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
 }
@@ -493,12 +314,12 @@ html, body, #root {
   background: var(--glow-color);
 }
 
-/* Button & Interactive Hover Styles */
+/* Button & interactive hover styles */
 .btn-radar {
   border: 1px solid var(--border-color);
   background: rgba(var(--border-color-rgb), 0.12);
   color: var(--glow-color);
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   padding: 8px 16px;
   border-radius: 3px;
@@ -507,11 +328,9 @@ html, body, #root {
   justify-content: center;
   font-weight: bold;
   text-transform: uppercase;
-  font-family: var(--main-font);
 }
-
 .btn-radar:hover:not(:disabled) {
-  background: rgba(var(--glow-color-rgb), 0.22);
+  background: rgba(var(--glow-color-rgb), 0.2);
   box-shadow: 0 0 15px rgba(var(--glow-color-rgb), 0.7);
   text-shadow: 0 0 6px #fff;
   transform: translateY(-1px);
@@ -524,7 +343,7 @@ html, body, #root {
   cursor: not-allowed;
 }
 
-/* Player Color Bindings */
+/* Player color bindings for UI styling */
 .text-p1 { color: var(--p1-color) !important; text-shadow: 0 0 8px rgba(51, 255, 102, 0.4); }
 .text-p2 { color: var(--p2-color) !important; text-shadow: 0 0 8px rgba(255, 183, 0, 0.4); }
 .text-p3 { color: var(--p3-color) !important; text-shadow: 0 0 8px rgba(0, 229, 255, 0.4); }
@@ -543,7 +362,7 @@ html, body, #root {
 .bg-p4 { background-color: var(--p4-color) !important; }
 .bg-neutral { background-color: var(--neutral-color) !important; }
 
-/* Retro loading bar */
+/* Retro terminal loading bar */
 .loader-bar {
   height: 4px;
   background: var(--border-color);
@@ -570,17 +389,18 @@ html, body, #root {
    TAILWIND UTILITY FALLBACKS FOR VANILLA CSS ENVIRONMENT
    ========================================================================== */
 
+/* Layout & Sizing */
 .w-full { width: 100%; }
 .h-full { height: 100%; }
 .h-16 { height: 4rem; }
 .h-64 { height: 16rem; }
 .h-40 { height: 10rem; }
 .h-\[450px\] { height: 450px; }
-.max-w-md { max-width: 28rem; }
-.max-w-lg { max-width: 32rem; }
-.max-w-2xl { max-width: 42rem; }
-.max-w-3xl { max-width: 48rem; }
-.max-w-4xl { max-width: 56rem; }
+.max-w-md { max-w: 28rem; }
+.max-w-lg { max-w: 32rem; }
+.max-w-2xl { max-w: 42rem; }
+.max-w-3xl { max-w: 48rem; }
+.max-w-4xl { max-w: 56rem; }
 .w-24 { width: 6rem; }
 .w-80 { width: 20rem; }
 .min-h-screen { min-height: 100vh; }
@@ -598,7 +418,7 @@ html, body, #root {
 .items-start { align-items: flex-start; }
 .justify-center { justify-content: center; }
 .justify-between { justify-content: space-between; }
-.justify-around { justify-around: space-around; }
+.justify-around { justify-content: space-around; }
 .justify-end { justify-content: flex-end; }
 .flex-grow { flex-grow: 1; }
 .flex-shrink-0 { flex-shrink: 0; }
@@ -628,3 +448,191 @@ html, body, #root {
 .p-4 { padding: 1rem; }
 .p-6 { padding: 1.5rem; }
 .p-8 { padding: 2rem; }
+.px-1 { padding-left: 0.25rem; padding-right: 0.25rem; }
+.px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+.px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+.px-4 { padding-left: 1rem; padding-right: 1rem; }
+.px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+.py-0\.5 { padding-top: 0.125rem; padding-bottom: 0.125rem; }
+.py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+.py-1\.5 { padding-top: 0.375rem; padding-bottom: 0.375rem; }
+.py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+.py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+.pt-1 { padding-top: 0.25rem; }
+.pt-4 { padding-top: 1rem; }
+.pt-6 { padding-top: 1.5rem; }
+.pb-1 { padding-bottom: 0.25rem; }
+
+/* Margins */
+.mb-0\.5 { margin-bottom: 0.125rem; }
+.mb-1 { margin-bottom: 0.25rem; }
+.mb-1\.5 { margin-bottom: 0.375rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-3 { margin-bottom: 0.75rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mb-6 { margin-bottom: 1.5rem; }
+.mb-8 { margin-bottom: 2rem; }
+.mt-0\.5 { margin-top: 0.125rem; }
+.mt-1 { margin-top: 0.25rem; }
+.mt-2 { margin-top: 0.5rem; }
+.mt-4 { margin-top: 1rem; }
+.mt-6 { margin-top: 1.5rem; }
+.mt-8 { margin-top: 2rem; }
+.ml-0\.5 { margin-left: 0.125rem; }
+.ml-1 { margin-left: 0.25rem; }
+.ml-2 { margin-left: 0.5rem; }
+.mx-4 { margin-left: 1rem; margin-right: 1rem; }
+.mx-auto { margin-left: auto; margin-right: auto; }
+.inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+
+/* Typography */
+.text-xs { font-size: 0.75rem; line-height: 1rem; }
+.text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+.text-base { font-size: 1rem; line-height: 1.5rem; }
+.text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+.text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+.text-2xl { font-size: 1.5rem; line-height: 2rem; }
+.text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+.font-bold { font-weight: 700; }
+.font-semibold { font-weight: 600; }
+.font-mono { font-family: 'Share Tech Mono', monospace; }
+.uppercase { text-transform: uppercase; }
+.tracking-wider { tracking: 0.05em; letter-spacing: 0.05em; }
+.tracking-widest { tracking: 0.1em; letter-spacing: 0.1em; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-left { text-align: left; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Colors & Backgrounds */
+.bg-black { background-color: #000; }
+.bg-opacity-10 { --bg-op: 0.1; }
+.bg-opacity-20 { --bg-op: 0.2; }
+.bg-opacity-25 { --bg-op: 0.25; }
+.bg-opacity-30 { --bg-op: 0.3; }
+.bg-opacity-40 { --bg-op: 0.4; }
+.bg-opacity-50 { --bg-op: 0.5; }
+.bg-opacity-80 { --bg-op: 0.8; }
+.bg-opacity-90 { --bg-op: 0.9; }
+
+/* Compound background helper classes */
+.bg-black.bg-opacity-10 { background-color: rgba(0,0,0,0.1); }
+.bg-black.bg-opacity-20 { background-color: rgba(0,0,0,0.2); }
+.bg-black.bg-opacity-25 { background-color: rgba(0,0,0,0.25); }
+.bg-black.bg-opacity-30 { background-color: rgba(0,0,0,0.3); }
+.bg-black.bg-opacity-40 { background-color: rgba(0,0,0,0.4); }
+.bg-black.bg-opacity-50 { background-color: rgba(0,0,0,0.5); }
+.bg-black.bg-opacity-70 { background-color: rgba(0,0,0,0.7); }
+.bg-black.bg-opacity-80 { background-color: rgba(0,0,0,0.8); }
+.bg-black.bg-opacity-90 { background-color: rgba(0,0,0,0.9); }
+
+.bg-red-950.bg-opacity-10 { background-color: rgba(69,10,10,0.1); }
+.bg-red-950.bg-opacity-20 { background-color: rgba(69,10,10,0.2); }
+
+/* Color components opacity fallbacks */
+.bg-p1.bg-opacity-10 { background-color: rgba(51, 255, 102, 0.1) !important; }
+.bg-p1.bg-opacity-20 { background-color: rgba(51, 255, 102, 0.2) !important; }
+.bg-p1.bg-opacity-25 { background-color: rgba(51, 255, 102, 0.25) !important; }
+.bg-p1.bg-opacity-50 { background-color: rgba(51, 255, 102, 0.5) !important; }
+
+.bg-p2.bg-opacity-10 { background-color: rgba(255, 183, 0, 0.1) !important; }
+.bg-p2.bg-opacity-20 { background-color: rgba(255, 183, 0, 0.2) !important; }
+.bg-p2.bg-opacity-25 { background-color: rgba(255, 183, 0, 0.25) !important; }
+.bg-p2.bg-opacity-50 { background-color: rgba(255, 183, 0, 0.5) !important; }
+
+.bg-p3.bg-opacity-10 { background-color: rgba(0, 229, 255, 0.1) !important; }
+.bg-p3.bg-opacity-20 { background-color: rgba(0, 229, 255, 0.2) !important; }
+.bg-p3.bg-opacity-25 { background-color: rgba(0, 229, 255, 0.25) !important; }
+.bg-p3.bg-opacity-50 { background-color: rgba(0, 229, 255, 0.5) !important; }
+
+.bg-p4.bg-opacity-10 { background-color: rgba(224, 64, 251, 0.1) !important; }
+.bg-p4.bg-opacity-20 { background-color: rgba(224, 64, 251, 0.2) !important; }
+.bg-p4.bg-opacity-25 { background-color: rgba(224, 64, 251, 0.25) !important; }
+.bg-p4.bg-opacity-50 { background-color: rgba(224, 64, 251, 0.5) !important; }
+
+/* Color components hover states and hover opacities */
+.hover\:bg-p1:hover { background-color: var(--p1-color) !important; }
+.hover\:bg-p2:hover { background-color: var(--p2-color) !important; }
+.hover\:bg-p3:hover { background-color: var(--p3-color) !important; }
+.hover\:bg-p4:hover { background-color: var(--p4-color) !important; }
+
+.hover\:bg-p1.hover\:bg-opacity-10:hover { background-color: rgba(51, 255, 102, 0.1) !important; }
+.hover\:bg-p1.hover\:bg-opacity-25:hover { background-color: rgba(51, 255, 102, 0.25) !important; }
+
+.hover\:bg-p2.hover\:bg-opacity-10:hover { background-color: rgba(255, 183, 0, 0.1) !important; }
+.hover\:bg-p2.hover\:bg-opacity-25:hover { background-color: rgba(255, 183, 0, 0.25) !important; }
+
+.hover\:bg-p3.hover\:bg-opacity-10:hover { background-color: rgba(0, 229, 255, 0.1) !important; }
+.hover\:bg-p3.hover\:bg-opacity-25:hover { background-color: rgba(0, 229, 255, 0.25) !important; }
+
+.hover\:bg-p4.hover\:bg-opacity-10:hover { background-color: rgba(224, 64, 251, 0.1) !important; }
+.hover\:bg-p4.hover\:bg-opacity-25:hover { background-color: rgba(224, 64, 251, 0.25) !important; }
+
+/* Borders */
+.border { border-style: solid; border-width: 1px; }
+.border-2 { border-style: solid; border-width: 2px; }
+.border-t { border-top-style: solid; border-top-width: 1px; }
+.border-r { border-right-style: solid; border-right-width: 1px; }
+.border-b { border-bottom-style: solid; border-bottom-width: 1px; }
+.border-l { border-left-style: solid; border-left-width: 1px; }
+.border-dashed { border-style: dashed; }
+.border-opacity-30 { border-color: rgba(51, 255, 102, 0.3); }
+.border-opacity-40 { border-color: rgba(51, 255, 102, 0.4); }
+.border-opacity-10 { border-color: rgba(51, 255, 102, 0.1); }
+
+/* Border radius */
+.rounded { border-radius: 4px; }
+.rounded-full { border-radius: 9999px; }
+
+/* Positioning & Display */
+.relative { position: relative; }
+.absolute { position: absolute; }
+.fixed { position: fixed; }
+.z-10 { z-index: 10; }
+.z-50 { z-index: 50; }
+.pointer-events-none { pointer-events: none; }
+.overflow-hidden { overflow: hidden; }
+.overflow-y-auto { overflow-y: auto; }
+.cursor-pointer { cursor: pointer; }
+.inline-flex { display: inline-flex; }
+
+/* Utility animation calls */
+.animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+.animate-ping { animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite; }
+.animate-spin { animation: spin 10s linear infinite; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .5; }
+}
+@keyframes ping {
+  75%, 100% { transform: scale(1.4); opacity: 0; }
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Custom list items formatting */
+.space-y-2 > * + * { margin-top: 0.5rem; }
+.space-y-3 > * + * { margin-top: 0.75rem; }
+.space-y-4 > * + * { margin-top: 1rem; }
+.space-y-6 > * + * { margin-top: 1.5rem; }
+
+/* Responsive Media Queries */
+@media (min-width: 768px) {
+  .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+  .md\:flex-row { flex-direction: row !important; }
+}
+
+@media (max-width: 900px) {
+  .header-title { display: none !important; }
+}
+
+.glow-logo {
+  box-shadow: 0 0 15px rgba(var(--glow-color-rgb), 0.2);
+  filter: drop-shadow(0 0 10px rgba(var(--glow-color-rgb), 0.35));
+  transition: box-shadow 0.5s ease, filter 0.5s ease;
+}
+

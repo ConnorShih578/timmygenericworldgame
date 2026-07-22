@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import type { Player, TransitTroops, Alliance, GameLog, GameState, Posture, CountryNode } from './types/game';
 import { ERAS } from './constants/eras';
+import { generateRandomEmpireName } from './utils/empireNameGenerator';
 import { RenderConfig } from './components/RenderConfig';
 import { Lobby } from './components/Lobby';
 import { Preamble } from './components/Preamble';
@@ -33,6 +34,7 @@ const generateRoomCode = () => {
 // Generate user ID and default name
 const myPlayerId = 'usr_' + Math.random().toString(36).substring(2, 9);
 const myPlayerName = 'COMMANDER_' + Math.floor(1000 + Math.random() * 9000);
+const myDefaultEmpireName = generateRandomEmpireName();
 const playerColors = [
   '#33ff66', // Green
   '#ffb700', // Amber
@@ -92,6 +94,7 @@ export default function App() {
     const host: Player = {
       id: myPlayerId,
       name: myPlayerName,
+      empireName: myDefaultEmpireName,
       color: playerColors[0],
       starsAssigned: null,
       selectedCountryId: null,
@@ -117,6 +120,7 @@ export default function App() {
     const guest: Player = {
       id: myPlayerId,
       name: myPlayerName,
+      empireName: myDefaultEmpireName,
       color: playerColors[1],
       starsAssigned: null,
       selectedCountryId: null,
@@ -144,6 +148,7 @@ export default function App() {
     const host: Player = {
       id: myPlayerId,
       name: myPlayerName,
+      empireName: myDefaultEmpireName,
       color: playerColors[0],
       starsAssigned: null,
       selectedCountryId: null,
@@ -176,6 +181,7 @@ export default function App() {
     const bot: Player = {
       id: `bot_${botCount}_${Math.random().toString(36).substring(2, 6)}`,
       name: `COMBAT_BOT_${botCount + 1}`,
+      empireName: generateRandomEmpireName(),
       color: botColor,
       starsAssigned: null,
       selectedCountryId: null,
@@ -399,6 +405,12 @@ export default function App() {
       case 'era_change':
         updateGameState({ eraId: data.eraId });
         break;
+      case 'empire_name_update':
+        setGameState(prev => ({
+          ...prev,
+          players: prev.players.map(p => p.id === data.playerId ? { ...p, empireName: data.empireName } : p)
+        }));
+        break;
       case 'posture_submit':
         handlePostureChosen(payload.senderId, data.posture);
         break;
@@ -449,6 +461,17 @@ export default function App() {
     return [...stateRef.current.logs, logItem];
   };
 
+  const handleUpdateEmpireName = (playerId: string, empireName: string) => {
+    setGameState(prev => ({
+      ...prev,
+      players: prev.players.map(p => p.id === playerId ? { ...p, empireName } : p)
+    }));
+
+    if (!isOffline) {
+      broadcastAction('empire_name_update', { playerId, empireName });
+    }
+  };
+
   const handleStartGame = () => {
     updateGameState({
       phase: 'preamble',
@@ -463,7 +486,7 @@ export default function App() {
   const handlePreambleComplete = () => {
     updateGameState({
       phase: 'rps',
-      logs: addLog('Establishing tactical postures for drafting bracket determination.')
+      logs: addLog('Initiating Rock Paper Scissors round for draft order.')
     });
   };
 
@@ -495,7 +518,7 @@ export default function App() {
         // If in offline mode, make bots pick postures
         const finalPlayers = updatedPlayers.map(p => {
           if (p.isBot && p.posture === null) {
-            const postures: Posture[] = ['offensive', 'defensive', 'infiltration'];
+            const postures: Posture[] = ['rock', 'paper', 'scissors'];
             const botPosture = postures[Math.floor(Math.random() * postures.length)];
             return { ...p, posture: botPosture };
           }
@@ -507,12 +530,12 @@ export default function App() {
         
         if (resolved.isTie) {
           nextTie = true;
-          // Reset postures for a replay
+          // Reset choices for a replay
           players = finalPlayers.map(p => ({ ...p, posture: null }));
           const time = new Date().toLocaleTimeString();
           logs.push({
             id: Math.random().toString(),
-            message: 'Conflict tie! Posture alignment failed. Re-calibrating immediately.',
+            message: "It's a tie! Re-rolling Rock Paper Scissors.",
             timestamp: time
           });
         } else {
@@ -551,13 +574,13 @@ export default function App() {
         
         if (p1.posture === p2.posture) continue;
 
-        // Defensive (Rock) beats Offensive (Scissors)
-        // Offensive (Scissors) beats Infiltration (Paper)
-        // Infiltration (Paper) beats Defensive (Rock)
+        // Rock beats Scissors
+        // Scissors beats Paper
+        // Paper beats Rock
         if (
-          (p1.posture === 'defensive' && p2.posture === 'offensive') ||
-          (p1.posture === 'offensive' && p2.posture === 'infiltration') ||
-          (p1.posture === 'infiltration' && p2.posture === 'defensive')
+          (p1.posture === 'rock' && p2.posture === 'scissors') ||
+          (p1.posture === 'scissors' && p2.posture === 'paper') ||
+          (p1.posture === 'paper' && p2.posture === 'rock')
         ) {
           scoreMap[p1.id]++;
         } else {
@@ -1478,6 +1501,7 @@ export default function App() {
           }}
           onAddBot={handleAddBot}
           onRemovePlayer={handleRemovePlayer}
+          onUpdateEmpireName={handleUpdateEmpireName}
           onStartGame={handleStartGame}
           onLeaveLobby={handleReset}
         />
@@ -1505,6 +1529,7 @@ export default function App() {
           players={gameState.players}
           currentUserId={myPlayerId}
           onSelectCountry={handleSelectCountry}
+          onUpdateEmpireName={handleUpdateEmpireName}
         />
       )}
 

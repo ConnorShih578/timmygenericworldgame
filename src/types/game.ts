@@ -1,6 +1,7 @@
 export interface Player {
   id: string;
   name: string;
+  empireName?: string;
   color: string; // Hex color for Phosphor themes
   isHost: boolean;
   isBot: boolean;
@@ -10,7 +11,7 @@ export interface Player {
   selectedCountryId: string | null;
 }
 
-export type Posture = 'defensive' | 'offensive' | 'infiltration'; // Rock, Scissors, Paper
+export type Posture = 'rock' | 'paper' | 'scissors';
 
 export interface CountryNode {
   id: string;

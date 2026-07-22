@@ -77,7 +77,7 @@ export const Preamble: React.FC<PreambleProps> = ({ era, onComplete }) => {
               onClick={handleProceed}
               className="btn-radar px-6 py-2 text-sm uppercase font-semibold text-p1 border-p1 animate-pulse"
             >
-              ESTABLISH_POSTURE
+              START_ROCK_PAPER_SCISSORS
             </button>
           )}
         </div>

@@ -1,8 +1,9 @@
 import React from 'react';
-import { User, Users, ShieldAlert, Cpu, Play, Plus, X } from 'lucide-react';
+import { User, Users, ShieldAlert, Cpu, Play, Plus, X, Dices } from 'lucide-react';
 import type { Player } from '../types/game';
 import { ERAS } from '../constants/eras';
 import { playSound } from '../utils/audio';
+import { generateRandomEmpireName, getEmpireName } from '../utils/empireNameGenerator';
 
 interface LobbyProps {
   roomCode: string;
@@ -13,6 +14,7 @@ interface LobbyProps {
   onSelectEra: (eraId: string) => void;
   onAddBot: () => void;
   onRemovePlayer: (playerId: string) => void;
+  onUpdateEmpireName?: (playerId: string, empireName: string) => void;
   onStartGame: () => void;
   onLeaveLobby: () => void;
 }
@@ -26,6 +28,7 @@ export const Lobby: React.FC<LobbyProps> = ({
   onSelectEra,
   onAddBot,
   onRemovePlayer,
+  onUpdateEmpireName,
   onStartGame,
   onLeaveLobby,
 }) => {
@@ -50,15 +53,10 @@ export const Lobby: React.FC<LobbyProps> = ({
           <div>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold glow-text tracking-widest text-p1">
-                {selectedEraId === 'roman' ? 'ROMAN_SENATE_CHAMBER' :
-                 selectedEraId === 'napoleonic' ? 'ROYAL_COUNCIL_CHAMBER' :
-                 selectedEraId === 'british_empire' ? 'IMPERIAL_WAR_OFFICE' :
-                 selectedEraId === 'ww1' ? 'FIELD_DISPATCH_LOBBY' :
-                 selectedEraId === 'ww2' ? 'BUNKER_STAFF_LOBBY' :
-                 'CYBER_COMMAND_LOBBY'}
+                LOBBY_TERMINALS
               </h2>
               <div className="text-xs uppercase bg-opacity-20 bg-p1 border border-p1 px-2 py-0.5 text-p1">
-                COMMANDERS: {players.length}/4
+                ONLINE: {players.length}/4
               </div>
             </div>
             
@@ -67,35 +65,74 @@ export const Lobby: React.FC<LobbyProps> = ({
             <div className="space-y-3 mb-6">
               {players.map((player) => {
                 const isMe = player.id === currentUserId;
+                const canEditEmpire = isMe || (isHost && player.isBot);
+
                 return (
                   <div 
                     key={player.id} 
-                    className="flex justify-between items-center p-3 bg-black bg-opacity-40 border border-p1"
+                    className="flex flex-col gap-2 p-3 bg-black bg-opacity-40 border border-p1"
                     style={{ borderColor: player.color } as React.CSSProperties}
                   >
-                    <div className="flex items-center gap-3">
-                      {player.isBot ? (
-                        <Cpu className="w-5 h-5" style={{ color: player.color }} />
-                      ) : (
-                        <User className="w-5 h-5" style={{ color: player.color }} />
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-3">
+                        {player.isBot ? (
+                          <Cpu className="w-5 h-5" style={{ color: player.color }} />
+                        ) : (
+                          <User className="w-5 h-5" style={{ color: player.color }} />
+                        )}
+                        <span className="text-sm font-semibold tracking-wider" style={{ color: player.color }}>
+                          {player.name} {isMe && '(YOU)'}
+                        </span>
+                        {player.isHost && (
+                          <span className="text-[10px] border px-1 uppercase tracking-widest" style={{ color: player.color, borderColor: player.color }}>
+                            HOST
+                          </span>
+                        )}
+                      </div>
+                      {isHost && !player.isHost && (
+                        <button 
+                          onClick={() => { playSound.click(); onRemovePlayer(player.id); }} 
+                          className="text-xs uppercase hover:text-white px-2 py-1 rounded transition bg-red-950 border border-red-500 text-red-400"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
                       )}
-                      <span className="text-sm font-semibold tracking-wider" style={{ color: player.color }}>
-                        {player.name} {isMe && '(YOU)'}
+                    </div>
+
+                    {/* Empire Name designation section */}
+                    <div className="flex items-center gap-2 pt-1 border-t border-p1 border-opacity-20">
+                      <span className="text-[10px] uppercase text-p1 opacity-60 font-mono w-14 flex-shrink-0">
+                        EMPIRE:
                       </span>
-                      {player.isHost && (
-                        <span className="text-[10px] border px-1 uppercase tracking-widest" style={{ color: player.color, borderColor: player.color }}>
-                          HOST
+                      {canEditEmpire ? (
+                        <div className="flex gap-1.5 items-center flex-1">
+                          <input
+                            type="text"
+                            value={player.empireName || ''}
+                            onChange={(e) => onUpdateEmpireName && onUpdateEmpireName(player.id, e.target.value)}
+                            placeholder="Designate Empire Name"
+                            maxLength={24}
+                            className="bg-black border text-p1 px-2 py-0.5 text-xs font-mono w-full focus:outline-none focus:ring-1 focus:ring-p1"
+                            style={{ borderColor: player.color }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              playSound.click();
+                              if (onUpdateEmpireName) onUpdateEmpireName(player.id, generateRandomEmpireName());
+                            }}
+                            className="p-1 border border-p1 text-p1 hover:bg-p1 hover:bg-opacity-20 transition text-xs flex-shrink-0 flex items-center justify-center"
+                            title="Randomize Empire Name"
+                          >
+                            <Dices className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ) : (
+                        <span className="text-xs font-mono font-bold uppercase truncate" style={{ color: player.color }}>
+                          {getEmpireName(player)}
                         </span>
                       )}
                     </div>
-                    {isHost && !player.isHost && (
-                      <button 
-                        onClick={() => { playSound.click(); onRemovePlayer(player.id); }} 
-                        className="text-xs uppercase hover:text-white px-2 py-1 rounded transition bg-red-950 border border-red-500 text-red-400"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    )}
                   </div>
                 );
               })}
