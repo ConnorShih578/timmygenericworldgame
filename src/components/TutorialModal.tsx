@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, Target, Compass, Users, Award, ChevronRight, ChevronLeft, X, Dices, Keyboard, MousePointer } from 'lucide-react';
+import { Shield, Target, Compass, Users, Award, ChevronRight, ChevronLeft, X, Dices, MousePointer } from 'lucide-react';
 import { playSound } from '../utils/audio';
 
 interface TutorialModalProps {

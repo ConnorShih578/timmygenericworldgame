@@ -1,49 +1,81 @@
 # 🗺️ Timmy's Generic World Game (TGWG)
 
-A premium, real-time 2D multiplayer world conquest strategy game set across historical eras, featuring tactical alliances, undercover espionage, advanced pathfinding, and styled as a glowing phosphor military radar console.
+A premium, real-time 2D multiplayer world conquest strategy game set across historical eras, featuring custom empire designation, tactical alliances, undercover espionage, advanced pathfinding, and styled as a glowing phosphor military radar console.
 
 ---
 
-## 🎮 Game Features
+## 🎮 Game Features & Campaign Mechanics
 
-### ⚡ Core Mechanics
-- **BFS Empire Pathfinding**: Transport troops instantly between any connected territories in your empire, and launch border attacks against rival or neutral nodes connected to any part of your empire network.
-- **Zero-Battle Neutral Claims**: Gray territories on the map are unclaimed neutral zones. Marching forces to a gray node claims it instantly with **zero defender resistance or troop casualties**, making early-game expansion snappy and rewarding.
-- **Lewis & Clark Espionage**: Send undercover explorers to spy on adjacent territories. Success reveals exact defender counts and grants a **+25% attack bonus** (bypasses barriers). Capture triggers war, breaks alliances, and causes an immediate enemy counter-strike.
-- **Tactical Barriers**: Key borders (e.g. *English Channel*, *The Alps*, *Pacific Ocean*) act as defensive barriers, multiplying defense for the holder unless scouted beforehand.
-- **Vulnerability Cooldown**: Deploying troops leaves origin nodes disorganized and vulnerable (flashing red) for 5 seconds—freezing troop production and cutting defense in half.
+### 🏛️ Custom Empire Designations & Drafting
+- **Custom Empire Names**: Designate a custom title for your empire (e.g. *Obsidian Dominion*, *Crimson Imperium*) or inherit historical country titles. Includes an in-lobby and in-draft **`🎲` Random Empire Name Generator**.
+- **Rock Paper Scissors Drafting**: Campaigns begin with a Rock Paper Scissors selection to determine starting territory selection order.
+- **Star Brackets & Guerrilla Handicap**:
+  - **3-Star Class (★3)**: Superpowers with maximum infrastructure.
+  - **2-Star Class (★2)**: Regional powers with balanced positions.
+  - **1-Star Class (★1 - Guerrilla)**: Receives **+15 extra starting troops** per node and a passive **+30% Guerrilla Defense bonus** on all home nodes!
 
-### 📱 Interface & Experience
-- **Interactive Zoom & Pan**: Click/touch and drag on the map background to slide the viewport. Use floating zoom controls to magnify dense tactical regions (up to 4x) or reset the view instantly.
-- **Tuned Tap Targets**: Node hitboxes are optimized (Radius 20) for forgiving mobile taps without causing overlaps in dense clusters (e.g., Europe and East Asia).
-- **Responsive Layout**: Sidebar grids collapse smoothly with custom handle controls (`◀` and `▶`) to maximize map real estate on any screen resolution.
-- **Corner Badges**: Compact side badges for Action Mode (`top-left`) and Combat Resolution Toasts (`top-right`) keep the center of the screen completely clean and unblocked.
-- **6 Historical Eras**: Match campaigns across Roman Antiquity, World War I, World War II, the Cold War, Modern Day, and Future Cyber Scenarios.
+### ⚡ Combat & Strategic Infrastructure
+- **BFS Empire Pathfinding**: Transport troops instantly between any connected nodes in your empire network, and launch border attacks against rival or neutral nodes.
+- **Zero-Battle Neutral Claims**: Gray territories are unclaimed neutral zones. Marching forces to a gray node claims it instantly with **zero defender resistance or casualties**.
+- **Capital Integrity & Government Collapse**:
+  - **Capitals (★)**: Produce +1.0 troops/s.
+  - **Cities (🏙)**: Produce +0.8 troops/s.
+  - **Military Bases (⚔)**: Produce +0.4 troops/s with built-in fortress defense.
+  - **Government Collapse**: If your Capital node is captured, troop generation is cut by **-50% across all remaining empire sectors** until reclaimed!
+- **Vulnerability Cooldown**: Launching troops leaves origin nodes disorganized for **5 seconds** (flashing red): troop generation halts and defense drops to **0.5x (Double Damage taken)**.
+- **Fortification Mode**: Toggle Fortify on key nodes for **+50% defense** (+100% / 2.0x for 1★ class) at the cost of -50% troop production.
+
+### 🕵️ Espionage & Coalitions
+- **Lewis & Clark Espionage**: Send undercover scouts for 5 troops with 50/50 resolution:
+  - **Success (50%)**: Reveals exact defender counts & fortification status, and grants a **+25% attack bonus** (bypasses natural barriers like the Alps or Great Wall).
+  - **Captured (50%)**: Scout is executed, target mobilizes **+10 emergency troops**, launches a counter-strike, and triggers immediate war.
+- **Coalitions & Shared Victory**: Form alliances via the scoreboard to share open borders. If all surviving players enter a formal Coalition, **Allied Victory** is declared! Disbanding a coalition triggers a 10-second Truce warning.
 
 ---
 
-## 🚀 Setup & Installation
+## ⌨️ Controls & Hotkeys
 
-### 1. Clone & Install Dependencies
-Navigate to the project root and install package dependencies:
+- **Select Node**: Left-click any node to open **NODE TELEMETRY** details.
+- **Pan Map**: Left-click & drag empty map space.
+- **Zoom Map**: Mouse scroll wheel (or floating zoom controls).
+- **Keyboard Shortcuts**:
+  - `[A]`: Toggle Launch Expedition / Attack mode
+  - `[S]`: Toggle Lewis & Clark Scout mode
+  - `[F]`: Toggle Fortify Shields
+  - `[Esc]` or `[Space]`: Deselect current node
+  - `[H]`: Toggle Hotkey Help bar
+
+---
+
+## 🚀 Setup & Commands
+
+### 1. Install Dependencies
 ```bash
 npm install
 ```
 
-### 2. Configure Database & Realtime (Optional)
-The game comes **pre-configured out-of-the-box** with Supabase credentials. If you want to deploy your own database, run the SQL schema in [schema.sql](schema.sql) on your Supabase instance, then input your keys in the **Tactical Server Settings** drawer at the bottom of the main menu.
-
-### 3. Run Locally
-Launch the local development server:
+### 2. Development Server
+Launch the local dev server with hot reloading:
 ```bash
 npm run dev
 ```
-Open `http://localhost:5173` in one or more browser tabs to play!
+
+### 3. Build for Production
+Run full TypeScript type-checking (`tsc -b`) and bundle for production (`vite build`):
+```bash
+npm run build
+```
+
+### 4. Preview Build Locally
+Preview the production build output:
+```bash
+npm run preview
+```
 
 ---
 
 ## 🛠️ Technology Stack
-- **Framework**: [Vite](https://vite.dev) + [React](https://react.dev) + [TypeScript](https://www.typescriptlang.org)
-- **Styling**: Tailwind CSS + Custom CSS Variables (retro-phosphor CRT radar theme)
-- **Database/Realtime**: [Render Realtime Broadcast Channels]
+- **Framework**: [Vite](https://vite.dev) + [React 19](https://react.dev) + [TypeScript](https://www.typescriptlang.org)
+- **Styling**: Vanilla CSS + CSS Variables (Phosphor CRT radar theme & era themes)
+- **Networking**: WebSockets / Broadcast Channels (Multiplayer & Offline AI Bots)
 - **Icons**: Lucide React
